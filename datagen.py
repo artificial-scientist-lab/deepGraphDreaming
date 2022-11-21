@@ -12,28 +12,8 @@ from pytheus import theseus as th
 def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_output=True):
     """
     Generates graphs and computes their fidelity with respect to some desired state
-
-    Parameters
-    ----------
-    dimensions : numpy array
-        dimensionality of the graph we wwish to generate
-    desired_state : dict
-        This is a dictionary with the desired kets of our state as the keys and their weights as values
-    num_edges : int
-        Total number of edges that the graph can have
-    short_output : boolean
-        ????
-
-    Returns
-    -------
-    TYPE
-        concorrence:  C( |Psi> ) = √( 2 * ( 1 - TR_M( <Psi|Psi> ) ) ) where TR_M is partial trace (in subsystem M)
-        and return is sum over all possible bipartion
-
     """
 
-    # Dictionary with all possible kets given the input dimensions
-    all_kets_dict = {ket: [] for ket in th.allEdgeCovers(dimensions, order=0)}
     if num_edges == None:
         rand_graph = fc.Graph(th.buildAllEdges(dimensions))  # full graph
         rand_graph.getState()
@@ -42,7 +22,7 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
     fidelity = abs(rand_state @ desired_state) ** 2
 
     if short_output:  # array of the edges' weights (includes 0 valued edges) and fidelity
-        return np.array(list(rand_graph.weights)), fidelity
+        return rand_graph.weights, fidelity
     else:  # dictionaries with edges names and values, generated kets, and fidelity
         return rand_graph, rand_state.amplitudes, fidelity
 
