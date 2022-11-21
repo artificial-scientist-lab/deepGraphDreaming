@@ -59,7 +59,7 @@ if __name__ == '__main__':
     kets = hf.makeState('000000+111111')
     state = fc.State(kets, normalize=True)
     print(state)
-    num_of_examples = 10000000
+    num_of_examples = 100000
     input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
 
     print("Training Data...")
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         if ii % 100 == 0:
             print('Training data: ', ii, '/', num_of_examples)
 
-    with open('graph_examples_fidelity_neo.pkl', 'wb') as f:
+    with open('data_train.pkl', 'wb') as f:
         pickle.dump([data, res], f)
 
     print("Done!")
