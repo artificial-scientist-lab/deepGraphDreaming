@@ -12,13 +12,14 @@ import random
 import os
 from pytheus import help_functions as hf, fancy_classes as fc, theseus as th
 import yaml
+from yaml import Loader
 
 from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
 
 # We compute the fidelity of the final state of each quantum graph with respect to the GHZ state.
 stream = open("config_train.yaml", 'r')
-cnfg = yaml.load(stream)
+cnfg = yaml.load(stream, Loader=Loader)
 
 kets = hf.makeState(cnfg['state'])
 state = fc.State(kets, normalize=True)
@@ -31,24 +32,24 @@ args = parser.parse_args()
 shift = args.ii
 print(shift)
 
-num_of_examples = cnfg['num_of_examples']  # Training set size
-learnRate = cnfg['learnRate']  # Learning rate
-end_of_string = cnfg['end_of_string']  # file extension for the dataset of graphs we need to train on
+num_of_examples = int(float(cnfg['num_of_examples']))  # Training set size
+learnRate = float(cnfg['learnRate'])  # Learning rate
 nn_case = cnfg['nn_case']  # when we save the neural network as a .pt, this is the name that it inherits
-l2Lambda = cnfg['l2Lambda']  # Lambda parameter for L2 Regularization
-isL2Reg = cnfg['isL2Reg']  # Do we want to introduce L2 Regularization in the training process?
+l2Lambda = float(cnfg['l2Lambda'])  # Lambda parameter for L2 Regularization
+isL2Reg = float(cnfg['isL2Reg'])  # Do we want to introduce L2 Regularization in the training process?
 nnType = cnfg['nnType']  # What type of neural network do we want to train on
 
 print(f"Let's a go! Number of examples: {num_of_examples}")
 print(f"Learning Rate: {learnRate}")
 
-cnfg['seed'] = random.randint()
+seed = random.randint(1000,9999)
+cnfg['seed'] = seed
 random.seed(cnfg['seed'])
 
 # Generate a sample graph to extract additional properties (like the number of edges for our chosen graph shape)
 input_edges, ket_amplitudes, output_fidelity = generatorGraphFidelity(dims, state, num_edges=None,
                                                                       short_output=False)
-input_edge_weights = np.array(list(input_edges.values()))
+input_edge_weights = input_edges.weights
 
 # Load up the training dataset
 with open('data_train.pkl', 'rb') as f:
@@ -62,9 +63,12 @@ NN_INPUT = len(input_edge_weights)
 NN_OUTPUT = 1
 
 # Prepare saving the model
-direc = os.getcwd() + f'/GraphDreamForward2_{num_of_examples}' + nn_case + end_of_string
-print(os.getcwd() + f'/GraphDreamForward2_{num_of_examples}' + nn_case + end_of_string)
+direc = os.getcwd() + f'/models/' + nn_case +'_seed'+ str(cnfg['seed'])+ '.pt'
+print(direc)
 
 # train the model
+stream = open('models/config'+str(seed)+'.yaml', 'w')
+yaml.dump(cnfg, stream)
+
 train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, learnRate, direc, nn_case,
             num_of_examples, nnType, l2Lambda, isL2Reg)

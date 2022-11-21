@@ -116,7 +116,7 @@ def prep_data(num_of_examples, data, res, train_test_split):
 
 
 def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals_test_np, res_test_np, learnRate,
-                save_direc, suffix, num_of_examples, nnType, l2Lambda=0.001, l2Regularization=False):
+                save_direc, suffix, num_of_examples, nnType, l2Lambda=0.001, l2Regularization=False, save_fig=False):
     """
     Trains the neural netowork. Implementation of Type L2 Regularization onto the training process is a WIP
     
@@ -227,12 +227,12 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     plt.legend(loc="lower left")
     plt.show()
     print('Best test MSE: ', min(test_loss_evolution))
-    plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
+    if save_fig:
+        plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
 
     # Save thr model as a png
     torch.save(modelFidelity.state_dict(), save_direc)
     print("...DONE")
-    print("Wake up, sleepyhead!")
     print("--- %s seconds ---" % (time.time() - start_time))
 
     return True

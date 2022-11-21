@@ -2,8 +2,7 @@ state: '000000+111111'
 
 num_of_examples: '1.e5'
 learnRate: '1.e-3'
-end_of_string: '.pt'
-nn_case: '_4PartGHZ'
+nn_case: '6partGHZ'
 l2Lambda: 0.00001
 isL2Reg: False
 nnType: 1
