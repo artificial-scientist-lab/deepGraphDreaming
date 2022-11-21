@@ -1,11 +1,17 @@
+import io
+import zipfile
+
 import numpy as np
 import random
 import time
 
 import torch
+from pytheus import graphplot as gp
 from torch import nn
 
 import matplotlib.pyplot as plt
+
+from datagen import constructGraph
 
 
 class ff_network(nn.Module):
@@ -230,3 +236,182 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     print("--- %s seconds ---" % (time.time() - start_time))
 
     return True
+
+
+def neuron_selector(model, device, layer, neuron):
+    '''
+    This creates a new model with the same weights and biases as the input model
+    but only includes the trained layers up to the layer containing the neuron
+    we want to analyze.
+
+    The way this'll work is that we initialize a new model consisting of every layer of the trained neural network
+    up to the layer containing the neuron we want to analyze. We then create a new 'output layer' consisting solely of that particular neuron.
+    The weights/biases of the neuron must be the same as it was in the original.
+    '''
+
+    total_model = list(model.mynn.children())
+
+    old_output_layer = total_model[layer]  # The weights here are always the same! (as they should...)
+    in_features = old_output_layer.in_features
+
+    new_output_layer = nn.Linear(in_features, 1)  # The initial weights/biases here are random, 'uninitialized'values.
+
+    with torch.no_grad():
+        new_output_layer.weight[0] = old_output_layer.weight[neuron]
+        new_output_layer.bias[0] = old_output_layer.bias[neuron]
+
+    if (layer == 0):
+        print("gobble gobble")
+        new_model = new_output_layer.to(device)
+    else:
+        print(f"gobble gobble {layer}")
+        middle_model = total_model[:layer - 1]
+        new_model = nn.Sequential(*middle_model, nn.ReLU(), new_output_layer).to(device)
+
+    new_model.eval()
+
+    return new_model
+
+
+def dream_model(dimensions, model, num_of_examples, desired_state, data_train, lr, num_epochs, name_of_zip, layer_index,
+                neuron_index, display=True):
+    """
+    Inverse trains the model by freezing the weights and biases and optimizing instead for the input.
+    In particular, we want to find the input that maximizes our output from whatever neuron we are interested in looking over
+
+    PARAMETERS
+    dimensions - dimension of our input (and desired graph)
+    model - our trained model
+    num_of_examples - number of examples in our dataset
+    desired state - we compute the fidelity of the dreamed graph states with respect to the desired state
+    data_train - input graph
+    lr - learning rate
+    num_epochs - maximum number of epochs that we run the dreaming
+    name_of_zip - name of the zip file that we save our graph movie frames
+    layer_index - the layer of our model that contains the neuron that we want to analyze
+    neuron_index - the neuron that we want to analyze
+    display - makes the output longer or shorter
+
+    """
+
+    loss_prediction = []
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    prop = 1
+
+    # data_train = edit_graph(data_train, upper_bound)
+
+    graph_edge_weights = torch.tensor(np.array(list(data_train.values())), dtype=torch.float).to(device)
+    data_train_prop = torch.tensor(prop, dtype=torch.float).to(device)
+    data_train_var = torch.autograd.Variable(graph_edge_weights, requires_grad=True)
+
+    # initiailize list of intermediate property values and molecules
+    interm_prop = []
+    nn_prop = []
+    gradDec = []
+    interm_graph = [data_train]
+
+    epoch_transformed = [0]
+    steps = 0
+    valid_steps = 0
+
+    # initialize an instance of the model
+    optimizer_encoder = torch.optim.Adam([data_train_var], lr=lr)
+    interm_model = neuron_selector(model, device, layer_index, neuron_index)
+
+    for epoch in range(num_epochs):
+
+        # feedforward step
+
+        calc_properties = interm_model(data_train_var)
+        nn_prop.append(calc_properties.cpu().detach().numpy())
+
+        # mean squared error between target and calculated property
+        calc_properties = calc_properties.reshape(1)
+        # criterion = nn.MSELoss()
+        # real_loss=criterion(calc_properties, data_train_prop) # So we calculate the mean squared error between the predicted fidelity and the target one
+        real_loss = -calc_properties
+        loss = torch.clamp(real_loss, min=-50000, max=50000.).double()
+        # backpropagation step
+
+        optimizer_encoder.zero_grad()
+        loss.backward()
+        optimizer_encoder.step()
+
+        real_loss = loss.cpu().detach().numpy()
+        loss_prediction.append(float(real_loss))
+
+        input_grad = data_train_var.grad.cpu().detach().numpy()
+        input_grad_norm = np.linalg.norm(input_grad, ord=2)
+        gradDec.append(input_grad_norm)
+
+        if epoch % 100 == 0:
+            print('epoch: ', epoch, ', gradient: ', input_grad_norm)
+
+        # We update our graph now with potentially new weight values and recompute the fidelity
+        neo_edge_weights = data_train_var.cpu().detach().numpy()
+        fidelity, edge_weights = constructGraph(neo_edge_weights, dimensions, desired_state)
+
+        if len(interm_prop) == 0 or interm_prop[len(interm_prop) - 1] != fidelity:
+
+            # collect intermediate graphs
+            interm_graph.append(edge_weights)
+            interm_prop.append(fidelity)
+
+            steps += 1
+            epoch_transformed.append(epoch + 1)
+
+            if len(interm_prop) > 1:
+
+                # determine validity of transformation
+                previous_prop = interm_prop[len(interm_prop) - 2]
+                current_prop = fidelity
+
+                valid = (prop > previous_prop and current_prop > previous_prop) \
+                        or (prop < previous_prop and current_prop < previous_prop)
+
+                if valid:
+                    valid_steps += 1
+
+        if len(gradDec) > 1000:
+            if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:
+                print('The gradient is very near zero at this point, stop dreaming at epoch ', epoch)
+                break
+            else:
+                if nn_prop[-1] - nn_prop[-100] < 1e-7:
+                    print(
+                        'Our predictions arent changing much, maybe our gradient is going back and forth? Stop dreaming at epoch ',
+                        epoch)
+                    break
+
+    # Make a plot for the intermediate graph and save in a zip file.
+
+    if display:
+        print("Creating archive: {:s}".format(name_of_zip))
+
+        with zipfile.ZipFile(name_of_zip, mode="w") as zf:
+            for i in range(0, len(interm_graph), int(len(interm_graph) / 10)):
+                # First, we reformat the interm graph into something compatible with the graph plotting functions
+                graph_to_go = []
+
+                temp = interm_graph[i]
+                temp_keys = list(temp.keys())
+                temp_vals = list(temp.values())
+                for j in range(len(temp_keys)):
+                    graph_to_go.append(temp_keys[j] + tuple([temp_vals[j]]))
+
+                # Now save the interm plot to the zip
+                interm_graph_plot = gp.graphPlot(graph_to_go, 1, i, interm_prop[j], scaled_weights=True, show=False,
+                                                 max_thickness=10, multiple_graphs=True)
+                # input()
+                buf = io.BytesIO()
+                interm_graph_plot.savefig(buf)
+                img_name = "graph_fig_{:02d}.png".format(i)
+                zf.writestr(img_name, buf.getvalue())
+
+    percent_valid_transform = None
+
+    if steps > 0:
+        percent_valid_transform = valid_steps / steps * 100
+
+    return interm_prop[
+               -1], interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, percent_valid_transform, epoch_transformed

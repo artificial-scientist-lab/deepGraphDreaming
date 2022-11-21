@@ -12,7 +12,7 @@ import random
 import os
 
 from graph_dreamer import generatorGraphFidelity
-from deep_graph_dreaming import prep_data, train_model
+from neuralnet import prep_data, train_model
 
 # We compute the fidelity of the final state of each quantum graph with respect to the GHZ state. 
 desired_state_2 = {((0, 0), (1, 0), (2, 0), (3, 0)): (1 / np.sqrt(2)),

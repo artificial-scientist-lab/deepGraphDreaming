@@ -7,8 +7,8 @@ import os
 
 import torch
 
-from graph_dreamer import generatorGraphFidelity, dream_model, constructGraph
-from deep_graph_dreaming import prep_data, train_model, load_model
+from datagen import generatorGraphFidelity, constructGraph
+from neuralnet import prep_data, load_model, dream_model
 
 parser = argparse.ArgumentParser(description='generating lots of graphs')
 parser.add_argument('--ii', dest='ii', type=int,
@@ -85,7 +85,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device:", device)
 
 # Load up our trained neural network
-direc = os.getcwd() + f'/GraphDreamForward2_{num_of_examples}_4PartGHZ_small.pt'  # small indicates that we are going for the trained "small (5 layer, 30 neurons)" neural network
+direc = os.getcwd() + f'models/GraphDreamForward2_{num_of_examples}_4PartGHZ_small.pt'  # small indicates that we are going for the trained "small (5 layer, 30 neurons)" neural network
 model_fidelity = load_model(direc, device, NN_INPUT, NN_OUTPUT, num_of_examples, nnType)
 
 # We proceed to generate a initial set of edges from the dreaming process. We sample 3 graphs from our dataset
