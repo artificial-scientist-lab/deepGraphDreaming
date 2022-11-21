@@ -59,7 +59,7 @@ if __name__ == '__main__':
     kets = hf.makeState('000000+111111')
     state = fc.State(kets, normalize=True)
     print(state)
-    num_of_examples = 100000
+    num_of_examples = 10000000
     input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
 
     print("Training Data...")

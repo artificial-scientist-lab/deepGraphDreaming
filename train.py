@@ -58,7 +58,7 @@ with open('data_train.pkl', 'rb') as f:
 data = data_full[0:num_of_examples]
 res = res_full[0:num_of_examples]
 
-weights_train, weights_test, result_train, result_test = prep_data(num_of_examples, data, res, 0.95)
+weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
 NN_INPUT = len(input_edge_weights)
 NN_OUTPUT = 1
 

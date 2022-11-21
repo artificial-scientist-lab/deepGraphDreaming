@@ -103,7 +103,7 @@ def load_model(file_name, device, size_of_input, size_of_output, num_of_examples
     return model
 
 
-def prep_data(num_of_examples, data, res, train_test_split):
+def prep_data(data, res, train_test_split):
     idx_traintest = int(len(data) * train_test_split)
     vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
     # input_edges_train = input_edges[0:idx_traintest]

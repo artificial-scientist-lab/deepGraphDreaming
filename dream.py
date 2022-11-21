@@ -75,7 +75,7 @@ with open(f'graph_simple_fidelity_{num_of_examples_fixed}.pkl', 'rb') as f:
 
 data = data_full[0:num_of_examples_fixed]
 res = res_full[0:num_of_examples_fixed]
-vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(num_of_examples_fixed, data, res, 0.95)
+vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(data, res, 0.95)
 best_graph = np.argmax(res_train_np)  # Index pertaining to the graph with the highest fidelity in the dataset
 
 NN_INPUT = len(input_edge_weights)
