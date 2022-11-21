@@ -71,4 +71,4 @@ stream = open('models/config'+str(seed)+'.yaml', 'w')
 yaml.dump(cnfg, stream)
 
 train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, learnRate, direc, nn_case,
-            num_of_examples, nnType, l2Lambda, isL2Reg)
+            num_of_examples, nnType, cnfg['batch_size'], l2Lambda, isL2Reg)

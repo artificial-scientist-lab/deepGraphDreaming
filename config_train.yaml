@@ -6,3 +6,4 @@ nn_case: '6partGHZ'
 l2Lambda: 0.00001
 isL2Reg: False
 nnType: 1
+batch_size: 5000

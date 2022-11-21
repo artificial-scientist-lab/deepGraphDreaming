@@ -116,7 +116,8 @@ def prep_data(data, res, train_test_split):
 
 
 def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals_test_np, res_test_np, learnRate,
-                save_direc, suffix, num_of_examples, nnType, l2Lambda=0.001, l2Regularization=False, save_fig=False):
+                save_direc, suffix, num_of_examples, nnType, batch_size, l2Lambda=0.001, l2Regularization=False,
+                save_fig=False):
     """
     Trains the neural netowork. Implementation of Type L2 Regularization onto the training process is a WIP
     
@@ -135,16 +136,15 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     
     """
 
-    batch_size = min(len(vals_train_np),
-                     5e3)  # Large batch_size seems to be important (smaller number of examples the greater the number of batches)
+    batch_size = min(len(vals_train_np), batch_size)
     print('batch_size: ', batch_size)
     print('lr_enc: ', learnRate)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     start_time = time.time()
     print("Training neural network...")
-    modelFidelity = ff_network(size_of_input=NN_INPUT_SIZE, size_of_output=NN_OUTPUT_SIZE, type=nnType).to(device)
-    optimizer_predictor = torch.optim.Adam(modelFidelity.parameters(), lr=learnRate)
+    model = ff_network(size_of_input=NN_INPUT_SIZE, size_of_output=NN_OUTPUT_SIZE, type=nnType).to(device)
+    optimizer_predictor = torch.optim.Adam(model.parameters(), lr=learnRate)
 
     vals_train = torch.tensor(vals_train_np, dtype=torch.float).to(device)
     res_train = torch.tensor(res_train_np, dtype=torch.float).reshape([len(res_train_np), 1]).to(device)
@@ -161,29 +161,28 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
     print('Everything prepared, lets train')
 
-    for episode in range(100000):  # should be much larger, with good early stopping criteria
-        modelFidelity.train()
+    for epoch in range(100000):  # should be much larger, with good early stopping criteria
         clamp_loss = 0
+        model.train()
 
         x = [i for i in range(len(vals_train))]  # random shuffle input    
 
         random.shuffle(x)
         total_train_loss = 0
-        num_of_iterations = int(len(vals_train) / batch_size)
-        for idx in range(num_of_iterations):
+        num_episodes = int(len(vals_train) / batch_size)
+        for batch in range(num_episodes):
 
-            curr_idxs = x[int(idx * batch_size):int((idx + 1) * batch_size)]
-            vals_train_batch = vals_train[curr_idxs].to(device)
-            res_train_batch = res_train[curr_idxs].to(device)
+            batch_indices = x[int(batch * batch_size):int((batch + 1) * batch_size)]
+            vals_train_batch = vals_train[batch_indices].to(device)
+            res_train_batch = res_train[batch_indices].to(device)
 
-            calc_properties = modelFidelity(vals_train_batch)
-            real_loss = criterion(calc_properties, res_train_batch)
+            prediction = model(vals_train_batch)
+            real_loss = criterion(prediction, res_train_batch)
             # If L2 Regularization is turned on, modify the MSE loss accordingly
             if (l2Regularization):
-                l2_norm = sum(p.pow(2.0).sum() for p in modelFidelity.parameters())
+                l2_norm = sum(p.pow(2.0).sum() for p in model.parameters())
                 real_loss = real_loss + l2Lambda * l2_norm
 
-            # real_loss = criterion(calc_properties, res_train)
             clamp_loss = torch.clamp(real_loss, min=0., max=5000000.).double()
             total_train_loss += real_loss.detach().cpu().numpy()
 
@@ -191,29 +190,43 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
             clamp_loss.backward()
             optimizer_predictor.step()
 
+        if epoch % 10 == 0:
+            torch.save(model.state_dict(), save_direc)
+
         # Evaluating the current quality.
         with torch.no_grad():
-            modelFidelity.eval()
-            train_loss = total_train_loss / num_of_iterations
+            model.eval()
+            train_loss = total_train_loss / num_episodes
             train_loss_evolution.append(train_loss)
 
-            calc_properties = modelFidelity(vals_test)
-            test_loss = criterion(calc_properties, res_test).detach().cpu().numpy()
+            prediction = model(vals_test)
+            test_loss = criterion(prediction, res_test).detach().cpu().numpy()
             test_loss_evolution.append(test_loss)
 
-            if episode % 5 == 0:
-                print(str(episode), ' - train: ', train_loss, '; test: ', test_loss)
+            if epoch % 1 == 0:
+                print(str(epoch), ' - train: ', train_loss, '; test: ', test_loss, flush=True)
 
-            # We stop the training process if the test MSE on the neural network does not reach a further minimum past 500 steps, or if the training has been running for 5 hours
-            if len(test_loss_evolution) - np.argmin(test_loss_evolution) > 500:
+            if len(test_loss_evolution) - np.argmin(test_loss_evolution) > 50:
                 print('    Early stopping kicked in: test loss', np.argmin(test_loss_evolution),
                       len(test_loss_evolution))
                 break
 
-            if (time.time() - start_time) > 5 * 60 * 60:
+            if (time.time() - start_time) > 24 * 60 * 60:
                 print('    Early stopping kicked in: too much time has elasped')
                 break
-                # Plot the loss evolution of the training process and save it as a png
+    if save_fig:
+        plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
+                  vals_train_np)
+
+    print('Best test MSE: ', min(test_loss_evolution))
+    print("...DONE")
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    return True
+
+
+def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
+              vals_train_np):
     plt.plot(train_loss_evolution, label='train')
     plt.clf()
     plt.plot(train_loss_evolution, label='train')
@@ -226,16 +239,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     plt.xlabel('episode')
     plt.legend(loc="lower left")
     plt.show()
-    print('Best test MSE: ', min(test_loss_evolution))
-    if save_fig:
-        plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
-
-    # Save thr model as a png
-    torch.save(modelFidelity.state_dict(), save_direc)
-    print("...DONE")
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    return True
+    plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
 
 
 def neuron_selector(model, device, layer, neuron):
