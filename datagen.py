@@ -1,50 +1,14 @@
 import pickle
 from random import randrange
 
-import pytheus.theseus as th
 import numpy as np
+import pytheus.help_functions as hf
+import pytheus.fancy_classes as fc
 from pytheus import theseus as th
 
 
 # # Training data generator
 # # Fidelity generating function (Tareq)
-
-def compute_fidelity(q_state, desired_state):
-    ' For now, let us just see what is is exactly that we are feeding this '
-
-    """
-    Computes the fidelity of a graph's resulting quantum state with respect to some desired quantum state
-
-    Parameters
-    ----------
-    state : numpy array
-        state list in state_format (see top) [1,0,0,0.7,1.2,...]
-    sys_dict : dict
-        that stores essential infos of quantuum system (see top.get_sysdict).
-
-    Returns
-    -------
-    TYPE
-        concorrence:  C( |Psi> ) = √( 2 * ( 1 - TR_M( <Psi|Psi> ) ) ) where TR_M is partial trace (in subsystem M)
-        and return is sum over all possible bipartion
-
-    """
-
-    AllEquations = []
-    TargetEquations = []
-    for state1 in q_state:
-        newEq = q_state[state1]
-        for state2 in desired_state:
-            if (state1 == state2):
-                TargetEquations.append(newEq)
-        AllEquations.append(newEq)
-
-    NormalisationConstant = np.sum(np.array(AllEquations) ** 2)
-
-    Fidelity = np.abs(np.sum(np.array(TargetEquations))) ** 2 / (len(TargetEquations) * NormalisationConstant)
-    return Fidelity
-
-
 def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_output=True):
     """
     Generates graphs and computes their fidelity with respect to some desired state
@@ -71,73 +35,29 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
     # Dictionary with all possible kets given the input dimensions
     all_kets_dict = {ket: [] for ket in th.allEdgeCovers(dimensions, order=0)}
     if num_edges == None:
-        rand_graph = th.buildAllEdges(dimensions)  # full graph
-        possible_kets = th.stateCatalog(th.findPerfectMatchings(rand_graph))
-    else:
-        perfect_matching = False
-        count_perfect_matchings = 0
-        while not perfect_matching:  # Check to guarantee at least one perfect matching
-            rand_graph = th.buildRandomGraph(dimensions=dimensions, num_edges=num_edges)
-            possible_kets = th.stateCatalog(th.findPerfectMatchings(rand_graph))
-            count_perfect_matchings = len(possible_kets)
-            if len(possible_kets) > 0: perfect_matching = True
-    '''
-    print(all_kets_dict.items())
-    time.sleep(5)
-    '''
-    all_kets_dict.update(possible_kets)
-    # Now the dictionary includes the perfect matchings from the random graph
-    '''
-    print(all_kets_dict.items())
-    time.sleep(5)
-    '''
-    # Dictionary with edge values (randomly assigned)
-    edge_weights = {edge: 0 for edge in th.buildAllEdges(dimensions)}
-    for edge in rand_graph:
-        edge_weights[edge] = 2 * np.random.rand() - 1
-
-    # Dictionary with the amplitudes for each of the possible kets
-    ket_amplitudes = {ket: 0 for ket in all_kets_dict.keys()}
-    for ket, graph_list in all_kets_dict.items():
-        for graph in graph_list:
-            term = 1
-            for edge in graph:
-                term *= edge_weights[edge]
-            ket_amplitudes[ket] += term
-
-    # Generation of concurrence with Jan's functions
-    ket_coeffs = np.array(list(ket_amplitudes.values()))
-    fidelity = compute_fidelity(ket_amplitudes, desired_state)
+        rand_graph = fc.Graph(th.buildAllEdges(dimensions))  # full graph
+        rand_graph.getState()
+        rand_state = rand_graph.state
+        rand_state.normalize()
+    fidelity = abs(rand_state @ desired_state) ** 2
 
     if short_output:  # array of the edges' weights (includes 0 valued edges) and fidelity
-        return np.array(list(edge_weights.values())), fidelity
+        return np.array(list(rand_graph.weights)), fidelity
     else:  # dictionaries with edges names and values, generated kets, and fidelity
-        return edge_weights, ket_amplitudes, fidelity
+        return rand_graph, rand_state.amplitudes, fidelity
+
 
 def constructGraph(neoEdgeWeights, dimensions, desired_state):
     # We update our graph now with potentially new weight values and recompute the fidelity
     graph_neo = th.buildAllEdges(dimensions)
-    all_kets_dict = {ket: [] for ket in th.allEdgeCovers(dimensions, order=0)}
-    possible_kets = th.stateCatalog(th.findPerfectMatchings(graph_neo))
-    all_kets_dict.update(possible_kets)
+    graph_neo = fc.Graph(graph_neo, weights=neoEdgeWeights)
+    graph_neo.getState()
+    state_neo = graph_neo.state
+    state_neo.normalize()
 
-    edge_weights = {edge: 0 for edge in th.buildAllEdges(dimensions)}
-    ii = 0
-    for edge in graph_neo:
-        edge_weights[edge] = neoEdgeWeights[ii]
-        ii += 1
+    fidelity = abs(state_neo @ desired_state)
 
-    ket_amplitudes = {ket: 0 for ket in all_kets_dict.keys()}
-    for ket, graph_list in all_kets_dict.items():
-        for graph in graph_list:
-            term = 1
-            for edge in graph:
-                term *= edge_weights[edge]
-            ket_amplitudes[ket] += term
-
-    fidelity = compute_fidelity(ket_amplitudes, desired_state)
-
-    return fidelity, edge_weights
+    return fidelity, graph_neo
 
 
 def edit_graph(graph, upper_bound):
@@ -152,47 +72,28 @@ def edit_graph(graph, upper_bound):
 
     return graph
 
+
 if __name__ == '__main__':
 
-    DIM = [2] * 4
-    # 4-particle GHZ state. Let's focus on this for now
-
-    desired_state_2 = {
-        ((0, 0), (1, 0), (2, 0), (3, 0)): (1 / np.sqrt(2)),
-        ((0, 1), (1, 1), (2, 1), (3, 1)): (1 / np.sqrt(2))
-    }
+    DIM = [2] * 6
+    kets = hf.makeState('000000+111111')
+    state = fc.State(kets, normalize=True)
+    print(state)
     num_of_examples = 10000000
-    input_edges, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, desired_state_2, num_edges=None,
-                                                                          short_output=False)
-    input_edge_weights = np.array(list(input_edges.values()))
+    input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
 
-    # input_edges returns an array of floats between +- 1 .... are these the weights of the edges?
+    print("Training Data...")
+    data = np.zeros((num_of_examples, len(input_graph)))
+    res = np.zeros((num_of_examples, 1))
 
-    create_training_data_new = True
+    for ii in range(num_of_examples):
+        input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
+        data[ii, :] = input_graph.weights
+        res[ii] = output_fidelity
+        if ii % 100 == 0:
+            print('Training data: ', ii, '/', num_of_examples)
 
-    if create_training_data_new == True:
-        print("Training Data...")
-        data = np.zeros((num_of_examples, len(input_edges)))
-        res = np.zeros((num_of_examples, 1))
+    with open('graph_examples_fidelity_neo.pkl', 'wb') as f:
+        pickle.dump([data, res], f)
 
-        for ii in range(num_of_examples):
-            input_edges, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, desired_state_2, num_edges=None,
-                                                                                  short_output=False)
-            input_edge_weights = np.array(list(input_edges.values()))
-            data[ii, :] = input_edge_weights
-            res[ii] = output_fidelity
-            if ii % 100 == 0:
-                print('Training data: ', ii, '/', num_of_examples)
-
-        with open('graph_examples_fidelity_neo.pkl', 'wb') as f:
-            pickle.dump([data, res], f)
-
-    else:
-        with open('graph_simple_fidelity_10000000.pkl', 'rb') as f:
-            data_full, res_full = pickle.load(f)
-
-        data = data_full[0:num_of_examples]
-        res = res_full[0:num_of_examples]
-
-    # split data into train and test
     print("Done!")

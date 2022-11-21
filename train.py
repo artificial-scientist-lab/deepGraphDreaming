@@ -11,7 +11,7 @@ import pickle
 import random
 import os
 
-from graph_dreamer import generatorGraphFidelity
+from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
 
 # We compute the fidelity of the final state of each quantum graph with respect to the GHZ state. 
