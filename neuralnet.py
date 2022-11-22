@@ -1,6 +1,7 @@
 import io
 import zipfile
-
+import csv
+import os
 import numpy as np
 import random
 import time
@@ -151,9 +152,8 @@ def prep_data(data, res, train_test_split):
     return vals_train_np, vals_test_np, res_train_np, res_test_np
 
 
-def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals_test_np, res_test_np, learnRate,
-                save_direc, suffix, num_of_examples, nnType, batch_size, l2Lambda=0.001, l2Regularization=False,
-                save_fig=False):
+def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals_test_np, res_test_np, save_direc,
+                suffix, config, l2Regularization=False, save_fig=False):
     """
     Trains the neural netowork. Implementation of Type L2 Regularization onto the training process is a WIP
     
@@ -172,10 +172,20 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     
     """
 
-    batch_size = min(len(vals_train_np), batch_size)
+    num_of_examples = int(float(config['num_of_examples']))  # Training set size
+    learnRate = float(config['learnRate'])  # Learning rate
+    l2Lambda = float(config['l2Lambda'])  # Lambda parameter for L2 Regularization
+    nnType = config['nnType']  # What type of neural network do we want to train on
+
+    batch_size = min(len(vals_train_np), config['batch_size'])
     print('batch_size: ', batch_size)
     print('lr_enc: ', learnRate)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    if not os.path.exists('losses'):
+        os.makedirs('losses')
+    seed = config['seed']
+    loss_file = f'losses/loss{seed}.csv'
 
     start_time = time.time()
     print("Training neural network...")
@@ -241,6 +251,10 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
             if epoch % 1 == 0:
                 print(str(epoch), ' - train: ', train_loss, '; test: ', test_loss, flush=True)
+                with open(loss_file, 'a') as f:
+                    writer = csv.writer(f, delimiter=";")
+                    writer.writerow(
+                        [train_loss, test_loss])
 
             if len(test_loss_evolution) - np.argmin(test_loss_evolution) > 50:
                 print('    Early stopping kicked in: test loss', np.argmin(test_loss_evolution),

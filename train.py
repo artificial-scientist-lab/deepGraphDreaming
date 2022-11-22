@@ -64,5 +64,5 @@ print(direc, flush=True)
 stream = open(f'models/config{seed}.yaml', 'w')
 yaml.dump(cnfg, stream)
 
-train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, learnRate, direc, model_prefix,
-            num_of_examples, nnType, cnfg['batch_size'], l2Lambda, isL2Reg)
+train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, direc, model_prefix, cnfg,
+            isL2Reg)
