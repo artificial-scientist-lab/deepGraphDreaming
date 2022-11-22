@@ -277,7 +277,7 @@ def neuron_selector(model, device, layer, neuron):
     return new_model
 
 
-def dream_model(dimensions, model, num_of_examples, desired_state, data_train, lr, num_epochs, name_of_zip, layer_index,
+def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, name_of_zip, layer_index,
                 neuron_index, display=True):
     """
     Inverse trains the model by freezing the weights and biases and optimizing instead for the input.

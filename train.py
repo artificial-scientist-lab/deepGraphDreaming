@@ -25,16 +25,9 @@ kets = hf.makeState(cnfg['state'])
 state = fc.State(kets, normalize=True)
 dims = th.stateDimensions(state.kets)
 
-parser = argparse.ArgumentParser(description='generating lots of graphs')
-parser.add_argument('--ii', dest='ii', type=int,
-                    default=None, help='')
-args = parser.parse_args()
-shift = args.ii
-print(shift)
-
 num_of_examples = int(float(cnfg['num_of_examples']))  # Training set size
 learnRate = float(cnfg['learnRate'])  # Learning rate
-nn_case = cnfg['nn_case']  # when we save the neural network as a .pt, this is the name that it inherits
+model_prefix = cnfg['model_prefix']  # when we save the neural network as a .pt, this is the name that it inherits
 l2Lambda = float(cnfg['l2Lambda'])  # Lambda parameter for L2 Regularization
 isL2Reg = float(cnfg['isL2Reg'])  # Do we want to introduce L2 Regularization in the training process?
 nnType = cnfg['nnType']  # What type of neural network do we want to train on
@@ -42,7 +35,8 @@ nnType = cnfg['nnType']  # What type of neural network do we want to train on
 print(f"Let's a go! Number of examples: {num_of_examples}")
 print(f"Learning Rate: {learnRate}")
 
-seed = random.randint(1000,9999)
+seed = random.randint(1000, 9999)
+print(f'seed: {seed}')
 cnfg['seed'] = seed
 random.seed(cnfg['seed'])
 
@@ -63,12 +57,12 @@ NN_INPUT = len(input_edge_weights)
 NN_OUTPUT = 1
 
 # Prepare saving the model
-direc = os.getcwd() + f'/models/' + nn_case +'_seed'+ str(cnfg['seed'])+ '.pt'
-print(direc)
+direc = os.getcwd() + f'/models/{model_prefix}_seed{seed}.pt'
+print(direc, flush=True)
 
 # train the model
-stream = open('models/config'+str(seed)+'.yaml', 'w')
+stream = open(f'models/config{seed}.yaml', 'w')
 yaml.dump(cnfg, stream)
 
-train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, learnRate, direc, nn_case,
+train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, learnRate, direc, model_prefix,
             num_of_examples, nnType, cnfg['batch_size'], l2Lambda, isL2Reg)

@@ -1,0 +1,9 @@
+state: '000000+111111'
+num_of_examples: 10000000
+learnRate: '1.e-4'
+num_of_examples_fixed:
+num_of_epochs: 30000
+layer_indices:
+  - 2
+neuron_index_set: 1
+nnType: 2

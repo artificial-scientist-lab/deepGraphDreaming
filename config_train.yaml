@@ -2,7 +2,7 @@ state: '000000+111111'
 
 num_of_examples: '1.e10'
 learnRate: '1.e-3'
-nn_case: '6partGHZ'
+model_prefix: '6partGHZ'
 l2Lambda: 0.00001
 isL2Reg: False
 nnType: 1
