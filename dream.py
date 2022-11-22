@@ -67,7 +67,7 @@ print("Device:", device)
 
 # Load up our trained neural network
 direc = os.getcwd() + f'models/GraphDreamForward2_{num_of_examples}_4PartGHZ_small.pt'  # small indicates that we are going for the trained "small (5 layer, 30 neurons)" neural network
-model_fidelity = load_model(direc, device, NN_INPUT, NN_OUTPUT, num_of_examples, nnType)
+model_fidelity = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 
 # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
 

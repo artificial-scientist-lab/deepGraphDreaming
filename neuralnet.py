@@ -75,7 +75,7 @@ class ff_network(nn.Module):
         return res
 
 
-def load_model(file_name, device, size_of_input, size_of_output, num_of_examples, nnType):
+def load_model(file_name, device, size_of_input, size_of_output, nnType):
     """
     Load existing model state dict from file
     
