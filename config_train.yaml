@@ -5,5 +5,5 @@ learnRate: '1.e-3'
 model_prefix: '6partGHZ'
 l2Lambda: 0.00001
 isL2Reg: False
-nnType: 3
-batch_size: 5000
+nnType: 4
+batch_size: 10000
