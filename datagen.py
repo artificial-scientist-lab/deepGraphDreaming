@@ -15,7 +15,8 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
     """
 
     if num_edges == None:
-        rand_graph = fc.Graph(th.buildAllEdges(dimensions))  # full graph
+        alledges = th.buildAllEdges(dimensions)
+        rand_graph = fc.Graph(alledges, weights=2 * np.random.rand(len(alledges)) - 1)  # full graph
         rand_graph.getState()
         rand_state = rand_graph.state
         rand_state.normalize()
