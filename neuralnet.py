@@ -327,8 +327,7 @@ def neuron_selector(model, device, layer, neuron):
     return new_model
 
 
-def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, name_of_zip, layer_index,
-                neuron_index, display=True):
+def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=True):
     """
     Inverse trains the model by freezing the weights and biases and optimizing instead for the input.
     In particular, we want to find the input that maximizes our output from whatever neuron we are interested in looking over
@@ -347,6 +346,11 @@ def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, na
     display - makes the output longer or shorter
 
     """
+    dimensions = cnfg['dims']
+    lr = float(cnfg['learnRate'])
+    num_epochs = cnfg['num_of_epochs']
+    layer_index = cnfg['layer']
+    neuron_index = cnfg['neuron']
 
     loss_prediction = []
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -354,15 +358,15 @@ def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, na
 
     # data_train = edit_graph(data_train, upper_bound)
 
-    graph_edge_weights = torch.tensor(np.array(list(data_train.values())), dtype=torch.float).to(device)
+    graph_edge_weights = torch.tensor(np.array(list(start_graph.weights)), dtype=torch.float).to(device)
     data_train_prop = torch.tensor(prop, dtype=torch.float).to(device)
     data_train_var = torch.autograd.Variable(graph_edge_weights, requires_grad=True)
 
-    # initiailize list of intermediate property values and molecules
-    interm_prop = []
-    nn_prop = []
+    # initialize list of intermediate property values and molecules
+    fidelity_evolution = []
+    activation_evolution = []
     gradDec = []
-    interm_graph = [data_train]
+    interm_graph = [start_graph]
 
     epoch_transformed = [0]
     steps = 0
@@ -375,15 +379,14 @@ def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, na
     for epoch in range(num_epochs):
 
         # feedforward step
-
-        calc_properties = interm_model(data_train_var)
-        nn_prop.append(calc_properties.cpu().detach().numpy())
+        activation = interm_model(data_train_var)
+        activation_evolution.append(activation.cpu().detach().numpy())
 
         # mean squared error between target and calculated property
-        calc_properties = calc_properties.reshape(1)
+        activation = activation.reshape(1)
         # criterion = nn.MSELoss()
-        # real_loss=criterion(calc_properties, data_train_prop) # So we calculate the mean squared error between the predicted fidelity and the target one
-        real_loss = -calc_properties
+        # real_loss=criterion(activation, data_train_prop) # So we calculate the mean squared error between the predicted fidelity and the target one
+        real_loss = -activation
         loss = torch.clamp(real_loss, min=-50000, max=50000.).double()
         # backpropagation step
 
@@ -402,36 +405,38 @@ def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, na
             print('epoch: ', epoch, ', gradient: ', input_grad_norm)
 
         # We update our graph now with potentially new weight values and recompute the fidelity
-        neo_edge_weights = data_train_var.cpu().detach().numpy()
-        fidelity, edge_weights = constructGraph(neo_edge_weights, dimensions, desired_state)
+        modified_edge_weights = data_train_var.cpu().detach().numpy()
+        fidelity, edge_weights = constructGraph(modified_edge_weights, dimensions, desired_state)
 
-        if len(interm_prop) == 0 or interm_prop[len(interm_prop) - 1] != fidelity:
+        if len(fidelity_evolution) == 0 or fidelity_evolution[len(fidelity_evolution) - 1] != fidelity:
 
             # collect intermediate graphs
             interm_graph.append(edge_weights)
-            interm_prop.append(fidelity)
+            fidelity_evolution.append(fidelity)
 
             steps += 1
             epoch_transformed.append(epoch + 1)
 
-            if len(interm_prop) > 1:
-
-                # determine validity of transformation
-                previous_prop = interm_prop[len(interm_prop) - 2]
-                current_prop = fidelity
-
-                valid = (prop > previous_prop and current_prop > previous_prop) \
-                        or (prop < previous_prop and current_prop < previous_prop)
-
-                if valid:
-                    valid_steps += 1
+            # I dont get it?
+            #
+            # if len(fidelity_evolution) > 1:
+            #
+            #     # determine validity of transformation
+            #     previous_prop = fidelity_evolution[- 2]
+            #     current_prop = fidelity
+            #
+            #     valid = (prop > previous_prop and current_prop > previous_prop) \
+            #             or (prop < previous_prop and current_prop < previous_prop)
+            #
+            #     if valid:
+            #         valid_steps += 1
 
         if len(gradDec) > 1000:
             if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:
                 print('The gradient is very near zero at this point, stop dreaming at epoch ', epoch)
                 break
             else:
-                if nn_prop[-1] - nn_prop[-100] < 1e-7:
+                if activation_evolution[-1] - activation_evolution[-100] < 1e-7:
                     print(
                         'Our predictions arent changing much, maybe our gradient is going back and forth? Stop dreaming at epoch ',
                         epoch)
@@ -454,7 +459,8 @@ def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, na
                     graph_to_go.append(temp_keys[j] + tuple([temp_vals[j]]))
 
                 # Now save the interm plot to the zip
-                interm_graph_plot = gp.graphPlot(graph_to_go, 1, i, interm_prop[j], scaled_weights=True, show=False,
+                interm_graph_plot = gp.graphPlot(graph_to_go, 1, i, fidelity_evolution[j], scaled_weights=True,
+                                                 show=False,
                                                  max_thickness=10, multiple_graphs=True)
                 # input()
                 buf = io.BytesIO()
@@ -462,10 +468,10 @@ def dream_model(dimensions, model, desired_state, data_train, lr, num_epochs, na
                 img_name = "graph_fig_{:02d}.png".format(i)
                 zf.writestr(img_name, buf.getvalue())
 
-    percent_valid_transform = None
+    #percent_valid_transform = None
 
-    if steps > 0:
-        percent_valid_transform = valid_steps / steps * 100
+    #if steps > 0:
+    #    percent_valid_transform = valid_steps / steps * 100
 
-    return interm_prop[
-               -1], interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, percent_valid_transform, epoch_transformed
+    return fidelity_evolution[
+               -1], interm_graph, loss_prediction, fidelity_evolution, activation_evolution, gradDec, percent_valid_transform, epoch_transformed

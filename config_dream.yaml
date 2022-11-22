@@ -6,4 +6,8 @@ num_of_epochs: 30000
 layer_indices:
   - 2
 neuron_index_set: 1
-nnType: 2
+nnType: 3
+modelname: '6partGHZ.pt'
+start_graph: 'best'
+layer: 6
+neuron: 1

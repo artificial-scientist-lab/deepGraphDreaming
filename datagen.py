@@ -31,6 +31,7 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
 def constructGraph(neoEdgeWeights, dimensions, desired_state):
     # We update our graph now with potentially new weight values and recompute the fidelity
     graph_neo = th.buildAllEdges(dimensions)
+    neoEdgeWeights = [float(item) for item in neoEdgeWeights]
     graph_neo = fc.Graph(graph_neo, weights=neoEdgeWeights)
     graph_neo.getState()
     state_neo = graph_neo.state

@@ -18,12 +18,12 @@ neuron_index_sets = []
 neuron_index_sets.append(np.arange(0, 30, 1))
 neuron_index_sets.append(np.arange(0, 400, 2))
 neuron_index_sets.append(np.arange(0, 200, 2))
-neuron_index_sets.append( np.arange(0, 100, 2))
+neuron_index_sets.append(np.arange(0, 100, 2))
 neuron_index_sets.append(np.arange(0, 60, 2))
 neuron_index_sets.append(np.arange(0, 50, 2))
 neuron_index_sets.append(np.arange(0, 30, 1))
 
-stream = open("config_train.yaml", 'r')
+stream = open("config_dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
 num_of_examples = cnfg['num_of_examples']  # training set size
@@ -32,7 +32,12 @@ num_of_examples_fixed = num_of_examples
 num_of_epochs = cnfg['num_of_epochs']  # for how many epochs should we run the inverse training?
 layer_indices = cnfg['layer_indices']  # The indices corresponding to the hidden layers of the neural network
 neuron_indices = neuron_index_sets[cnfg['neuron_index_set']]  # the neuron indices for each hidden layer
+
+layer = cnfg['layer']  # The indices corresponding to the hidden layers of the neural network
+neuron = cnfg['neuron']  # the neuron indices for each hidden layer
+
 nnType = cnfg['nnType']  # the type of neural network we wish to examine
+modelname = cnfg['modelname']
 
 print(f"Let's a go! Number of examples: {num_of_examples}")
 print(f"Learning rate: {learnRate}")
@@ -44,10 +49,10 @@ random.seed(cnfg['seed'])
 
 kets = hf.makeState(cnfg['state'])
 state = fc.State(kets, normalize=True)
-dims = th.stateDimensions(state.kets)
+cnfg['dims'] = th.stateDimensions(state.kets)
 
 # We generate a graph for the purposes of obtaining some additional properties about the graphs we are generating (e.g. we have 24 edge)
-input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(dims, state, num_edges=None,
+input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(cnfg['dims'], state, num_edges=None,
                                                                       short_output=False)
 
 # Load up a dataset of generated graphs
@@ -66,47 +71,31 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device:", device)
 
 # Load up our trained neural network
-direc = os.getcwd() + f'models/GraphDreamForward2_{num_of_examples}_4PartGHZ_small.pt'  # small indicates that we are going for the trained "small (5 layer, 30 neurons)" neural network
-model_fidelity = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
+direc = os.getcwd() + f'/models/{modelname}'
+model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 
 # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
 
-rando = random.sample(range(0, len(res_test_np)), 3)
-start_res = []
-start_graphs = []
-for r in rando:  # Construct the graphs associated to the edge weights we've chosen
-    *_, randGraph = constructGraph(vals_test_np[r], dims, state)
-    start_graphs.append(randGraph)
+if cnfg['start_graph'] == 'best':
+    ind = best_graph
+else:
+    ind = random.randint(0, len(res_test_np))
 
-# Add the highest fidelity graph to the initial set 
-*_, randGraph = constructGraph(vals_train_np[best_graph], dims, state)
-start_graphs.append(randGraph)
-start_res = np.append(res_test_np[rando], res_train_np[best_graph])
+*_, start_graph = constructGraph(vals_test_np[ind], cnfg['dims'], state)
+start_res = res_test_np[ind]
 
-initial_prop_list = []
 final_prop_list = []  # the fidelity of the final dreamed graphs
 percent_valid_transforms = []  # number of vaild transformation steps taken during the dreaming process
 start_time = time.time()
 
-# We proceed dreaming on each graph in the data set
-for i in range(0, len(start_res)):
-
-    # the way it works is that we do dreaming on the graph using the trained neural network up to a specific layer and using the chosen neuron as the output neuron.
-    # This is done by creating a new neural network with all the weights and biases of the original neural network up to and including the layer/neuron pair.
-    # We also save how the graph looks in each step of the dreaming process as a png in a zip file. These are used to make the movies.
-    for j in range(0, len(layer_indices)):
-        for k in range(0, len(neuron_indices)):
-            name_of_zip = f'Intermediate Graphs V2/zip_test_graph_{i}_{num_of_examples}_{layer_indices[j]}_{neuron_indices[k]}.zip'
-            initial_prop_list.append(float(start_res[i]))
-            final_prop, interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, percent_valid_transform, *_ = dream_model(
-                dims, model_fidelity, state, start_graphs[i], learnRate, num_of_epochs,
-                name_of_zip, layer_indices[j], neuron_indices[k], display=True)
-            final_prop_list.append(final_prop)
-            percent_valid_transforms.append(percent_valid_transform)
-            with open(
-                    f'Dreamed Graph Pickles V2/dream_graph_{i}_{num_of_examples}_{layer_indices[j]}_{neuron_indices[k]}.pkl',
-                    'wb') as f:
-                pickle.dump([interm_graph, interm_prop, nn_prop, gradDec, loss_prediction], f)
+name_of_zip = f'intermediategraphs/zip_test_graph.zip'
+final_prop, interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, percent_valid_transform, *_ = dream_model(
+    model, state, start_graph, name_of_zip, cnfg, display=False)
+final_prop_list.append(final_prop)
+percent_valid_transforms.append(percent_valid_transform)
+with open(f'Dreamed Graph Pickles V2/dream_graph_{i}_{num_of_examples}_{layer}_{neuron}.pkl',
+          'wb') as f:
+    pickle.dump([interm_graph, interm_prop, nn_prop, gradDec, loss_prediction], f)
 
 # You can uncomment this if you want to plot the histograph of dreamed graph fidelities. 
 '''
