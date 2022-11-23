@@ -83,23 +83,18 @@ else:
     ind = random.randint(0, len(res_test_np))
 
 *_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
-start_res = res_train_np[ind]
+start_res = float(res_train_np[ind])
+start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float))
 with open(cnfg['dream_file'], 'a') as f:
     writer = csv.writer(f, delimiter=";")
-    writer.writerow([start_res, start_graph.weights])
+    writer.writerow([start_res, start_pred, start_graph.weights])
 
 final_prop_list = []  # the fidelity of the final dreamed graphs
 start_time = time.time()
 
 name_of_zip = f'intermediategraphs/zip_test_graph.zip'
-final_prop, interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, *_ = dream_model(
-    model, state, start_graph, name_of_zip, cnfg, display=False)
-#final_prop_list.append(final_prop)
-#with open(f'Dreamed Graph Pickles V2/dream_graph_{i}_{num_of_examples}_{layer}_{neuron}.pkl',
-#          'wb') as f:
-#    pickle.dump([interm_graph, interm_prop, nn_prop, gradDec, loss_prediction], f)
+dream_model(model, state, start_graph, cnfg)
 
-# You can uncomment this if you want to plot the histograph of dreamed graph fidelities. 
 '''
 plt.hist(final_prop_list, 25, alpha=0.5, label = 'Dreamed Fidelity')
 plt.hist(initial_prop_list, 25, alpha=0.5, label = 'Initial Fidelity')

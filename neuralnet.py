@@ -327,7 +327,7 @@ def neuron_selector(model, device, layer, neuron):
     return new_model
 
 
-def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=True):
+def dream_model(model, desired_state, start_graph, cnfg):
     """
     Inverse trains the model by freezing the weights and biases and optimizing instead for the input.
     In particular, we want to find the input that maximizes our output from whatever neuron we are interested in looking over
@@ -399,16 +399,15 @@ def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=Tr
         input_grad_norm = np.linalg.norm(input_grad, ord=2)
         gradDec.append(input_grad_norm)
 
-
-        # We update our graph now with potentially new weight values and recompute the fidelity
-        modified_edge_weights = data_train_var.cpu().detach().numpy()
-        fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
-
         if epoch % 100 == 0:
-            print('epoch: ', epoch, ', gradient: ', input_grad_norm, flush=True)
+            # We update our graph now with potentially new weight values and recompute the fidelity
+            modified_edge_weights = data_train_var.cpu().detach().numpy()
+            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
+            activation = interm_model(data_train_var)
+            print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:
                 writer = csv.writer(f, delimiter=";")
-                writer.writerow([fidelity, dream_graph.weights])
+                writer.writerow([fidelity, activation, dream_graph.weights])
 
         if len(gradDec) > 1000:
             if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:
@@ -421,36 +420,4 @@ def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=Tr
                         epoch)
                     break
 
-    # Make a plot for the intermediate graph and save in a zip file.
-
-    if display:
-        print("Creating archive: {:s}".format(name_of_zip))
-
-        with zipfile.ZipFile(name_of_zip, mode="w") as zf:
-            for i in range(0, len(interm_graph), int(len(interm_graph) / 10)):
-                # First, we reformat the interm graph into something compatible with the graph plotting functions
-                graph_to_go = []
-
-                temp = interm_graph[i]
-                temp_keys = list(temp.keys())
-                temp_vals = list(temp.values())
-                for j in range(len(temp_keys)):
-                    graph_to_go.append(temp_keys[j] + tuple([temp_vals[j]]))
-
-                # Now save the interm plot to the zip
-                interm_graph_plot = gp.graphPlot(graph_to_go, 1, i, fidelity_evolution[j], scaled_weights=True,
-                                                 show=False,
-                                                 max_thickness=10, multiple_graphs=True)
-                # input()
-                buf = io.BytesIO()
-                interm_graph_plot.savefig(buf)
-                img_name = "graph_fig_{:02d}.png".format(i)
-                zf.writestr(img_name, buf.getvalue())
-
-    #percent_valid_transform = None
-
-    #if steps > 0:
-    #    percent_valid_transform = valid_steps / steps * 100
-
-    return fidelity_evolution[
-               -1], interm_graph, loss_prediction, fidelity_evolution, activation_evolution, gradDec, epoch_transformed
+    return 0
