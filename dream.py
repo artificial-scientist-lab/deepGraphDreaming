@@ -15,7 +15,7 @@ from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--array', dest='ii', type=int, default=None, help='')
+parser.add_argument(dest='ii')
 args = parser.parse_args()
 proc_id = args.ii
 
