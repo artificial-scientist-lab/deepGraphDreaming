@@ -84,7 +84,7 @@ else:
 
 *_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
 start_res = float(res_train_np[ind])
-start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float))
+start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float).to(device))
 with open(cnfg['dream_file'], 'a') as f:
     writer = csv.writer(f, delimiter=";")
     writer.writerow([start_res, start_pred, start_graph.weights])
