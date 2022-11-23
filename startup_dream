@@ -14,7 +14,7 @@
 
 
 # memory
-#SBATCH --mem=180GB
+#SBATCH --mem=80GB
 #SBATCH --time=165:00:00
 
 

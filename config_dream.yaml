@@ -8,7 +8,7 @@ layer_indices:
 neuron_index_set: 1
 nnType: 3
 modelname: '6partGHZ_seed8686.pt'
-start_graph: 'best'
+start_graph: 'random'
 layer: 10
 neuron: 0
 dream_file: 'dreamfiles/dream'
