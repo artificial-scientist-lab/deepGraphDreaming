@@ -81,7 +81,7 @@ if cnfg['start_graph'] == 'best':
 else:
     ind = random.randint(0, len(res_test_np))
 
-*_, start_graph = constructGraph(vals_test_np[ind], cnfg['dims'], state)
+*_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
 start_res = res_test_np[ind]
 
 final_prop_list = []  # the fidelity of the final dreamed graphs
