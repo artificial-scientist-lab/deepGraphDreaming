@@ -14,6 +14,13 @@ import torch
 from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--array', dest='ii', type=int, default=None, help='')
+args = parser.parse_args()
+proc_id = args.ii
+
+
+
 # All the neuron sets below correspond to the trained neural network consisting of 15 hidden layers
 neuron_index_sets = []
 neuron_index_sets.append(np.arange(0, 30, 1))
@@ -26,6 +33,8 @@ neuron_index_sets.append(np.arange(0, 30, 1))
 
 stream = open("config_dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
+cnfg['dream_file'] += f'{proc_id}.csv'
+print(cnfg['dream_file'])
 
 num_of_examples = cnfg['num_of_examples']  # training set size
 learnRate = cnfg['learnRate']  # learning rate of inverse training
@@ -80,11 +89,11 @@ model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 if cnfg['start_graph'] == 'best':
     ind = best_graph
 else:
-    ind = random.randint(0, len(res_test_np))
+    ind = random.randint(0, len(res_train_np))
 
 *_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
 start_res = float(res_train_np[ind])
-start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float).to(device))
+start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float).to(device)).item()
 with open(cnfg['dream_file'], 'a') as f:
     writer = csv.writer(f, delimiter=";")
     writer.writerow([start_res, start_pred, start_graph.weights])

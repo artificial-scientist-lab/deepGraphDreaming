@@ -404,7 +404,7 @@ def dream_model(model, desired_state, start_graph, cnfg):
             modified_edge_weights = data_train_var.cpu().detach().numpy()
             fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
             activation = interm_model(data_train_var).item()
-            print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
+            #print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:
                 writer = csv.writer(f, delimiter=";")
                 writer.writerow([fidelity, activation, dream_graph.weights])
