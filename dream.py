@@ -82,7 +82,7 @@ else:
     ind = random.randint(0, len(res_test_np))
 
 *_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
-start_res = res_test_np[ind]
+start_res = res_train_np[ind]
 
 final_prop_list = []  # the fidelity of the final dreamed graphs
 start_time = time.time()
