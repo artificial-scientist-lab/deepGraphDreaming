@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1           # specify number of GPUs
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=1
 
 # Standard output and error:
 #SBATCH -o ./jobfiles/out.%j
@@ -19,4 +19,4 @@
 
 
 source venv/bin/activate
-srun python dream.py
+srun python dream.py $SLURM_ARRAY_TASK_ID
