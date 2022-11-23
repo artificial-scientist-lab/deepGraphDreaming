@@ -369,8 +369,6 @@ def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=Tr
     interm_graph = [start_graph]
 
     epoch_transformed = [0]
-    steps = 0
-    valid_steps = 0
 
     # initialize an instance of the model
     optimizer_encoder = torch.optim.Adam([data_train_var], lr=lr)
@@ -401,35 +399,16 @@ def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=Tr
         input_grad_norm = np.linalg.norm(input_grad, ord=2)
         gradDec.append(input_grad_norm)
 
-        if epoch % 100 == 0:
-            print('epoch: ', epoch, ', gradient: ', input_grad_norm)
 
         # We update our graph now with potentially new weight values and recompute the fidelity
         modified_edge_weights = data_train_var.cpu().detach().numpy()
-        fidelity, edge_weights = constructGraph(modified_edge_weights, dimensions, desired_state)
+        fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
 
-        if len(fidelity_evolution) == 0 or fidelity_evolution[len(fidelity_evolution) - 1] != fidelity:
-
-            # collect intermediate graphs
-            interm_graph.append(edge_weights)
-            fidelity_evolution.append(fidelity)
-
-            steps += 1
-            epoch_transformed.append(epoch + 1)
-
-            # I dont get it?
-            #
-            # if len(fidelity_evolution) > 1:
-            #
-            #     # determine validity of transformation
-            #     previous_prop = fidelity_evolution[- 2]
-            #     current_prop = fidelity
-            #
-            #     valid = (prop > previous_prop and current_prop > previous_prop) \
-            #             or (prop < previous_prop and current_prop < previous_prop)
-            #
-            #     if valid:
-            #         valid_steps += 1
+        if epoch % 100 == 0:
+            print('epoch: ', epoch, ', gradient: ', input_grad_norm, flush=True)
+            with open(cnfg['dream_file'], 'a') as f:
+                writer = csv.writer(f, delimiter=";")
+                writer.writerow([fidelity, dream_graph.weights])
 
         if len(gradDec) > 1000:
             if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:

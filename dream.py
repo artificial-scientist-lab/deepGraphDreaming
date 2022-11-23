@@ -7,6 +7,7 @@ import os
 import yaml
 from yaml import Loader
 from pytheus import fancy_classes as fc, theseus as th, help_functions as hf
+import csv
 
 import torch
 
@@ -83,6 +84,9 @@ else:
 
 *_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
 start_res = res_train_np[ind]
+with open(cnfg['dream_file'], 'a') as f:
+    writer = csv.writer(f, delimiter=";")
+    writer.writerow([start_res, start_graph.weights])
 
 final_prop_list = []  # the fidelity of the final dreamed graphs
 start_time = time.time()
@@ -90,10 +94,10 @@ start_time = time.time()
 name_of_zip = f'intermediategraphs/zip_test_graph.zip'
 final_prop, interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, *_ = dream_model(
     model, state, start_graph, name_of_zip, cnfg, display=False)
-final_prop_list.append(final_prop)
-with open(f'Dreamed Graph Pickles V2/dream_graph_{i}_{num_of_examples}_{layer}_{neuron}.pkl',
-          'wb') as f:
-    pickle.dump([interm_graph, interm_prop, nn_prop, gradDec, loss_prediction], f)
+#final_prop_list.append(final_prop)
+#with open(f'Dreamed Graph Pickles V2/dream_graph_{i}_{num_of_examples}_{layer}_{neuron}.pkl',
+#          'wb') as f:
+#    pickle.dump([interm_graph, interm_prop, nn_prop, gradDec, loss_prediction], f)
 
 # You can uncomment this if you want to plot the histograph of dreamed graph fidelities. 
 '''
