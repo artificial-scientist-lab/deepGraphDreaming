@@ -10,4 +10,4 @@ nnType: 3
 modelname: '6partGHZ_seed8686.pt'
 start_graph: 'best'
 layer: 10
-neuron: 1
+neuron: 0
