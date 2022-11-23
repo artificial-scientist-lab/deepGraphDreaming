@@ -7,7 +7,7 @@ layer_indices:
   - 2
 neuron_index_set: 1
 nnType: 3
-modelname: '6partGHZ.pt'
+modelname: '6partGHZ_seed8686.pt'
 start_graph: 'best'
-layer: 6
+layer: 10
 neuron: 1

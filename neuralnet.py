@@ -474,4 +474,4 @@ def dream_model(model, desired_state, start_graph, name_of_zip, cnfg, display=Tr
     #    percent_valid_transform = valid_steps / steps * 100
 
     return fidelity_evolution[
-               -1], interm_graph, loss_prediction, fidelity_evolution, activation_evolution, gradDec, percent_valid_transform, epoch_transformed
+               -1], interm_graph, loss_prediction, fidelity_evolution, activation_evolution, gradDec, epoch_transformed

@@ -85,14 +85,12 @@ else:
 start_res = res_test_np[ind]
 
 final_prop_list = []  # the fidelity of the final dreamed graphs
-percent_valid_transforms = []  # number of vaild transformation steps taken during the dreaming process
 start_time = time.time()
 
 name_of_zip = f'intermediategraphs/zip_test_graph.zip'
-final_prop, interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, percent_valid_transform, *_ = dream_model(
+final_prop, interm_graph, loss_prediction, interm_prop, nn_prop, gradDec, *_ = dream_model(
     model, state, start_graph, name_of_zip, cnfg, display=False)
 final_prop_list.append(final_prop)
-percent_valid_transforms.append(percent_valid_transform)
 with open(f'Dreamed Graph Pickles V2/dream_graph_{i}_{num_of_examples}_{layer}_{neuron}.pkl',
           'wb') as f:
     pickle.dump([interm_graph, interm_prop, nn_prop, gradDec, loss_prediction], f)
