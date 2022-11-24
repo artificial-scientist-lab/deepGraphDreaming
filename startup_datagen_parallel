@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --array=0
+#SBATCH --array=0-9
 # Standard output and error:
 #SBATCH -o ./jobfiles/out.%j
 #SBATCH -e ./jobfiles/err.%j
@@ -15,4 +15,4 @@
 
 
 source venv/bin/activate
-srun python datagen.py 0
+srun python datagen.py 1

@@ -5,7 +5,8 @@ import numpy as np
 import pytheus.help_functions as hf
 import pytheus.fancy_classes as fc
 from pytheus import theseus as th
-
+import argparse
+import csv
 
 # # Training data generator
 # # Fidelity generating function (Tareq)
@@ -57,25 +58,38 @@ def edit_graph(graph, upper_bound):
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument(dest='tocsv')
+    args = parser.parse_args()
+    tocsv = args.tocsv
+
     DIM = [2] * 6
     kets = hf.makeState('000000+111111')
     state = fc.State(kets, normalize=True)
     print(state)
-    num_of_examples = 10000000
+    num_of_examples = 100000000
+    filename = 'data100'
     input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
 
     print("Training Data...")
-    data = np.zeros((num_of_examples, len(input_graph)))
-    res = np.zeros((num_of_examples, 1))
+    if not tocsv:
+        data = np.zeros((num_of_examples, len(input_graph)))
+        res = np.zeros((num_of_examples, 1))
 
     for ii in range(num_of_examples):
         input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
-        data[ii, :] = input_graph.weights
-        res[ii] = output_fidelity
-        if ii % 100 == 0:
+        if tocsv:
+            with open(filename+'.csv', 'a') as f:
+                writer = csv.writer(f, delimiter=";")
+                writer.writerow([input_graph.weights, output_fidelity])
+        else:
+            data[ii, :] = input_graph.weights
+            res[ii] = output_fidelity
+        if ii % 1000 == 0:
             print('Training data: ', ii, '/', num_of_examples)
 
-    with open('data_train.pkl', 'wb') as f:
-        pickle.dump([data, res], f)
+    if not tocsv:
+        with open(filename+'.pkl', 'wb') as f:
+            pickle.dump([data, res], f)
 
     print("Done!")
