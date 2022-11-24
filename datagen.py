@@ -38,7 +38,7 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
     fidelity = abs(rand_state @ desired_state) ** 2
 
     if short_output:  # array of the edges' weights (includes 0 valued edges) and fidelity
-        return rand_graph.weights, fidelity
+        return randweights, fidelity
     else:  # dictionaries with edges names and values, generated kets, and fidelity
         return rand_graph, rand_state.amplitudes, fidelity
 
