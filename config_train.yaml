@@ -7,3 +7,4 @@ l2Lambda: 0.00001
 isL2Reg: False
 nnType: 4
 batch_size: 10000
+datafile: 'data100.csv'

@@ -13,6 +13,7 @@ import os
 from pytheus import help_functions as hf, fancy_classes as fc, theseus as th
 import yaml
 from yaml import Loader
+import pandas as pd
 
 from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
@@ -45,12 +46,19 @@ input_edges, ket_amplitudes, output_fidelity = generatorGraphFidelity(dims, stat
                                                                       short_output=False)
 input_edge_weights = input_edges.weights
 
-# Load up the training dataset
-with open('data_train.pkl', 'rb') as f:
-    data_full, res_full = pickle.load(f)
+if cnfg['datafile'].split('.')[-1] == 'pkl':
+    # Load up the training dataset
+    with open(cnfg['datafile'], 'rb') as f:
+        data_full, res_full = pickle.load(f)
 
-data = data_full[0:num_of_examples]
-res = res_full[0:num_of_examples]
+    data = data_full[0:num_of_examples]
+    res = res_full[0:num_of_examples]
+else:
+    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
+    data = np.array([eval(graph) for graph in df['weights']])
+    res = df['res'].to_numpy()
+    print(data)
+    print(res)
 
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
 NN_INPUT = len(input_edge_weights)
