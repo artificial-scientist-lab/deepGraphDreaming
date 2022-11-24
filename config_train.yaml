@@ -5,6 +5,7 @@ learnRate: '1.e-3'
 model_prefix: '6partGHZ'
 l2Lambda: 0.00001
 isL2Reg: False
-nnType: 1
+nnType: 5
 batch_size: 10000
 datafile: 'data_train.pkl'
+seed: 111

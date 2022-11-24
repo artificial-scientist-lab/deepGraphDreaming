@@ -36,9 +36,12 @@ nnType = cnfg['nnType']  # What type of neural network do we want to train on
 print(f"Let's a go! Number of examples: {num_of_examples}")
 print(f"Learning Rate: {learnRate}")
 
-seed = random.randint(1000, 9999)
+if 'seed' in cnfg:
+    seed = cnfg['seed']
+else:
+    seed = random.randint(1000, 9999)
+    cnfg['seed'] = seed
 print(f'seed: {seed}')
-cnfg['seed'] = seed
 random.seed(cnfg['seed'])
 
 # Generate a sample graph to extract additional properties (like the number of edges for our chosen graph shape)

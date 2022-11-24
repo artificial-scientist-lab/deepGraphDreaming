@@ -104,6 +104,26 @@ class ff_network(nn.Module):
                 nn.Linear(constantsize, size_of_output)
             )
 
+        if (type == 5):
+            constantsize = 200
+            self.mynn = nn.Sequential(
+                nn.Linear(size_of_input, constantsize),
+                nn.ReLU(),
+                nn.Linear(constantsize, constantsize),
+                nn.ReLU(),
+                nn.Linear(constantsize, constantsize),
+                nn.ReLU(),
+                nn.Linear(constantsize, constantsize),
+                nn.ReLU(),
+                nn.Linear(constantsize, constantsize),
+                nn.ReLU(),
+                nn.Linear(constantsize, constantsize),
+                nn.ReLU(),
+                nn.Linear(constantsize, 20),
+                nn.ReLU(),
+                nn.Linear(20, size_of_output)
+            )
+
     def forward(self, x):
         res = self.mynn(x)
         return res

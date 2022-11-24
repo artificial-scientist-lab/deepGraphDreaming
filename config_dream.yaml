@@ -3,10 +3,10 @@ num_of_examples: 10000000
 learnRate: '1.e-4'
 num_of_examples_fixed:
 num_of_epochs: 30000
-nnType: 1
-modelname: '6partGHZ_seed8686.pt'
+nnType: 5
+modelname: '6partGHZ_seed111.pt'
 start_graph: 'random'
-neuron_array: '[[8,i] for i in range(30)]'
+neuron_array: '[[12,i] for i in range(20)]'
 num_start_graphs: 1
 dream_file: 'dreamfiles/dream'
 datafile: 'data_train.pkl'
