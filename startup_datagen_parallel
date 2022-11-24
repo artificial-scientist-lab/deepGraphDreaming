@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --array=0-9
+#SBATCH --array=0-19
 # Standard output and error:
 #SBATCH -o ./jobfiles/out.%j
 #SBATCH -e ./jobfiles/err.%j
@@ -10,9 +10,9 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 # memory
-#SBATCH --mem=30GB
+#SBATCH --mem=90GB
 #SBATCH --time=100:00:00
 
 
 source venv/bin/activate
-srun python datagen.py 1
+srun python datagen.py

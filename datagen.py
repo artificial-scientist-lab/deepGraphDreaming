@@ -5,19 +5,33 @@ import numpy as np
 import pytheus.help_functions as hf
 import pytheus.fancy_classes as fc
 from pytheus import theseus as th
-import argparse
+import yaml
+from yaml import Loader
 import csv
 
-# # Training data generator
-# # Fidelity generating function (Tareq)
-def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_output=True):
+
+def discretize_weight(weight):
+    if abs(weight) > 0.33:
+        return 0
+    elif weight > 0:
+        return 1
+    else:
+        return -1
+
+
+def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_output=True, discretize=False):
     """
     Generates graphs and computes their fidelity with respect to some desired state
     """
 
     if num_edges == None:
         alledges = th.buildAllEdges(dimensions)
-        rand_graph = fc.Graph(alledges, weights=2 * np.random.rand(len(alledges)) - 1)  # full graph
+        randweights = 2 * np.random.rand(len(alledges)) - 1
+        if discretize:
+            weights = [discretize_weight(weight) for weight in randweights]
+        else:
+            weights = randweights
+        rand_graph = fc.Graph(alledges, weights=weights)  # full graph
         rand_graph.getState()
         rand_state = rand_graph.state
         rand_state.normalize()
@@ -58,38 +72,40 @@ def edit_graph(graph, upper_bound):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(dest='tocsv')
-    args = parser.parse_args()
-    tocsv = args.tocsv
+    stream = open("config_datagen.yaml", 'r')
+    cnfg = yaml.load(stream, Loader=Loader)
 
-    DIM = [2] * 6
-    kets = hf.makeState('000000+111111')
+    DIM = eval(cnfg['dim'])
+    kets = hf.makeState(cnfg['state'])
     state = fc.State(kets, normalize=True)
     print(state)
-    num_of_examples = 100000000
-    filename = 'data100'
+    num_of_examples = cnfg['num_of_examples']
+    file_type = cnfg['file_type']
+    filename = cnfg['file_name']
+    discretize = cnfg['discretize']
     input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
 
     print("Training Data...")
-    if not tocsv:
+    if file_type == 'pkl':
         data = np.zeros((num_of_examples, len(input_graph)))
         res = np.zeros((num_of_examples, 1))
 
     for ii in range(num_of_examples):
-        input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
-        if tocsv:
-            with open(filename+'.csv', 'a') as f:
+        # generate sample
+        weights, output_fidelity = generatorGraphFidelity(DIM, state, short_output=True,
+                                                                          discretize=discretize)
+        if file_type == 'csv':  # if csv, write line by line
+            with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")
-                writer.writerow([input_graph.weights, output_fidelity])
+                writer.writerow([weights, output_fidelity])
         else:
-            data[ii, :] = input_graph.weights
+            data[ii, :] = weights
             res[ii] = output_fidelity
         if ii % 1000 == 0:
             print('Training data: ', ii, '/', num_of_examples)
 
-    if not tocsv:
-        with open(filename+'.pkl', 'wb') as f:
+    if file_type == 'pkl':
+        with open(filename + '.pkl', 'wb') as f:
             pickle.dump([data, res], f)
 
     print("Done!")

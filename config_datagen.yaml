@@ -1,0 +1,6 @@
+state: '000000+111111'
+dim: '[2] * 4'
+num_of_examples: 500000
+file_name: 'discrete_4q_10M'
+file_type: 'csv'
+discretize: True
