@@ -51,7 +51,7 @@ for ii in range(num_start_graphs):
 parser = argparse.ArgumentParser()
 parser.add_argument(dest='ii')
 args = parser.parse_args()
-proc_id = args.ii
+proc_id = int(args.ii)
 
 # choose start graph
 start_graph_id = proc_id % num_start_graphs
