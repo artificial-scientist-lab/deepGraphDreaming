@@ -57,8 +57,6 @@ else:
     df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
     data = np.array([eval(graph) for graph in df['weights']])
     res = df['res'].to_numpy()
-    print(data)
-    print(res)
 
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
 NN_INPUT = len(input_edge_weights)

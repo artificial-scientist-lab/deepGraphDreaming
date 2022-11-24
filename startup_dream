@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --partition=gpu
-#SBATCH --array=0-99
+#SBATCH --array=0-29
 #SBATCH --gres=gpu:1           # specify number of GPUs
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

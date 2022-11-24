@@ -1,5 +1,3 @@
-import io
-import zipfile
 import csv
 import os
 import numpy as np
@@ -7,7 +5,6 @@ import random
 import time
 
 import torch
-from pytheus import graphplot as gp
 from torch import nn
 
 import matplotlib.pyplot as plt
