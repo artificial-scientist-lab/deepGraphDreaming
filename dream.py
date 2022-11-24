@@ -65,7 +65,9 @@ neuron_id = proc_id // num_start_graphs
 neuron_array = eval(cnfg['neuron_array'])
 cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
 
-cnfg['dream_file'] += f'{seed}/{start_graph_id}_{neuron_id}.csv'
+cnfg['dream_file'] += f'{seed}'
+dreamfolder = cnfg['dream_file']
+cnfg['dream_file'] +='/{start_graph_id}_{neuron_id}.csv'
 print(cnfg['dream_file'])
 
 kets = hf.makeState(cnfg['state'])
@@ -91,6 +93,8 @@ model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 *_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
 start_res = float(res_train_np[ind])
 start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float).to(device)).item()
+if not os.path.exists(dreamfolder):
+    os.makedirs(dreamfolder)
 with open(cnfg['dream_file'], 'a') as f:
     writer = csv.writer(f, delimiter=";")
     writer.writerow([start_res, start_pred, start_graph.weights])
