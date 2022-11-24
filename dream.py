@@ -67,7 +67,7 @@ cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
 
 cnfg['dream_file'] += f'{seed}'
 dreamfolder = cnfg['dream_file']
-cnfg['dream_file'] +='/{start_graph_id}_{neuron_id}.csv'
+cnfg['dream_file'] += f'/{start_graph_id}_{neuron_id}.csv'
 print(cnfg['dream_file'])
 
 kets = hf.makeState(cnfg['state'])
