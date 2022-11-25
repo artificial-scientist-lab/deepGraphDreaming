@@ -232,7 +232,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
         random.shuffle(x)
         total_train_loss = 0
-        num_episodes = int(len(vals_train) / batch_size)
+        num_episodes = int(len(vals_train) // batch_size)
         for batch in range(num_episodes):
 
             batch_indices = x[int(batch * batch_size):int((batch + 1) * batch_size)]
