@@ -1,4 +1,4 @@
-state: '000000+111111'
+state: '0000+1111'
 dim: '[2] * 4'
 num_of_examples: 500000 #if done in parallel, this is multiplied by the number of jobs
 file_name: 'discrete_4q_10M'

@@ -8,10 +8,11 @@ from pytheus import theseus as th
 import yaml
 from yaml import Loader
 import csv
+import math
 
 
 def discretize_weight(weight):
-    if abs(weight) > 0.33:
+    if abs(weight) < 0.33:
         return 0
     elif weight > 0:
         return 1
@@ -36,6 +37,8 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         rand_state = rand_graph.state
         rand_state.normalize()
     fidelity = abs(rand_state @ desired_state) ** 2
+    if math.isnan(fidelity):
+        fidelity = 0
 
     if short_output:  # array of the edges' weights (includes 0 valued edges) and fidelity
         return randweights, fidelity
@@ -93,7 +96,7 @@ if __name__ == '__main__':
     for ii in range(num_of_examples):
         # generate sample
         weights, output_fidelity = generatorGraphFidelity(DIM, state, short_output=True,
-                                                                          discretize=discretize)
+                                                          discretize=discretize)
         if file_type == 'csv':  # if csv, write line by line
             with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")
