@@ -22,7 +22,7 @@ learnRate = cnfg['learnRate']  # learning rate of inverse training
 num_of_epochs = cnfg['num_of_epochs']  # for how many epochs should we run the inverse training?
 nnType = cnfg['nnType']  # the type of neural network we wish to examine
 modelname = cnfg['modelname']
-num_start_graphs = cnfg['num_start_graphs'] if cnfg['start_graph'] == 'best' else 1
+num_start_graphs = cnfg['num_start_graphs'] if cnfg['start_graph'] == 'random' else 1
 
 # seed = random.randint(1000, 9999)
 # print(f'seed: {seed}')
