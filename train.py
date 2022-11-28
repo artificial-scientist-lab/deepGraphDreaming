@@ -14,6 +14,7 @@ from pytheus import help_functions as hf, fancy_classes as fc, theseus as th
 import yaml
 from yaml import Loader
 import pandas as pd
+import re
 
 from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
@@ -58,7 +59,7 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     res = res_full[0:num_of_examples]
 else:
     df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
-    data = np.array([eval(graph) for graph in df['weights']])
+    data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
     res = df['res'].to_numpy()
 
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
