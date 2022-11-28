@@ -61,6 +61,8 @@ else:
     df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
     data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
     res = df['res'].to_numpy()
+    data = data[0:num_of_examples]
+    res = res[0:num_of_examples]
 
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
 NN_INPUT = len(input_edge_weights)
