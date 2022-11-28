@@ -75,7 +75,7 @@ def edit_graph(graph, upper_bound):
 
 if __name__ == '__main__':
 
-    stream = open("config_datagen.yaml", 'r')
+    stream = open("configs/datagen.yaml", 'r')
     cnfg = yaml.load(stream, Loader=Loader)
 
     DIM = eval(cnfg['dim'])
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         if file_type == 'csv':  # if csv, write line by line
             with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")
-                writer.writerow([weights, output_fidelity])
+                writer.writerow([list(weights), output_fidelity])
         else:
             data[ii, :] = weights
             res[ii] = output_fidelity

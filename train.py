@@ -19,7 +19,7 @@ from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
 
 # We compute the fidelity of the final state of each quantum graph with respect to the GHZ state.
-stream = open("config_train.yaml", 'r')
+stream = open("configs/train.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
 kets = hf.makeState(cnfg['state'])

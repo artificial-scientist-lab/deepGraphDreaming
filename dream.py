@@ -14,7 +14,7 @@ import torch
 from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model
 
-stream = open("config_dream.yaml", 'r')
+stream = open("configs/dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
 learnRate = cnfg['learnRate']  # learning rate of inverse training

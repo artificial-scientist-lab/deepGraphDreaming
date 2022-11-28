@@ -17,24 +17,24 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**for data generation**, configure `config_datagen.yaml`, and run
+**for data generation**, configure `configs/datagen.yaml`, and run
 ```
-sbatch startup_datagen
+sbatch startup/datagen
 ```
 or
 ```
-sbatch startup_datagen
+sbatch startup/datagen_parallel
 ```
 
-**for training**, configure `config_train.yaml`, and run
+**for training**, configure `configs/train.yaml`, and run
 ```
-sbatch startup_train
+sbatch startup/train
 ```
 models and config files are saved
 
-**for dreaming**, configure `config_dream.yaml`, and run
+**for dreaming**, configure `configs/dream.yaml`, and run
 ```
-sbatch startup_dream
+sbatch startup/dream
 ```
 
 
