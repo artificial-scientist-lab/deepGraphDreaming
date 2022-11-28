@@ -24,7 +24,7 @@ def thresholded_linear(weight):
     if abs(weight) < 0.33:
         return 0
     else:
-        weight
+        return weight
 
 
 def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_output=True, discretize=False):
