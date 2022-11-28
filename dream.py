@@ -64,6 +64,7 @@ else:
 # choose neuron from array given in config
 neuron_id = proc_id // num_start_graphs
 neuron_array = eval(cnfg['neuron_array'])
+neuron_id = neuron_id % len(neuron_array)
 cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
 
 cnfg['dream_file'] += f'_{seed}'
