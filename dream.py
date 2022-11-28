@@ -10,6 +10,7 @@ from pytheus import fancy_classes as fc, theseus as th, help_functions as hf
 import csv
 import pandas as pd
 import torch
+import re
 
 from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model
@@ -39,7 +40,7 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     res = res_full[:]
 else:
     df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
-    data = np.array([eval(graph) for graph in df['weights']])
+    data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
     res = df['res'].to_numpy()
 vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(data, res, 0.95)
 best_graph = np.argmax(res_train_np)  # Index pertaining to the graph with the highest fidelity in the dataset
