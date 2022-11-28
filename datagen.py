@@ -5,6 +5,7 @@ import numpy as np
 import pytheus.help_functions as hf
 import pytheus.fancy_classes as fc
 from pytheus import theseus as th
+from pytheus.lossfunctions import fidelity
 import yaml
 from yaml import Loader
 import csv
@@ -37,9 +38,9 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         randweights = 2 * np.random.rand(len(alledges)) - 1
         if discretize:
             if discretize == 'thr_linear':
-                weights = [thresholded_linear(weight) for weight in randweights]
+                weights = list(map(thresholded_linear, randweights))
             else:
-                weights = [discretize_weight(weight) for weight in randweights]
+                weights = list(map(discretize_weight, randweights))
         else:
             weights = randweights
         rand_graph = fc.Graph(alledges, weights=weights)  # full graph
@@ -54,6 +55,24 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         return randweights, fidelity
     else:  # dictionaries with edges names and values, generated kets, and fidelity
         return rand_graph, rand_state.amplitudes, fidelity
+
+
+def quickgenerate(func, numargs):
+    """
+    Generates graphs and computes their fidelity with respect to some desired state
+    """
+
+    randweights = 2 * np.random.rand(numargs) - 1
+    if discretize:
+        if discretize == 'thr_linear':
+            weights = [thresholded_linear(weight) for weight in randweights]
+        else:
+            weights = [discretize_weight(weight) for weight in randweights]
+    else:
+        weights = randweights
+    fidelity = 1 - func(weights)
+
+    return randweights, fidelity
 
 
 def constructGraph(neoEdgeWeights, dimensions, desired_state):
@@ -96,17 +115,21 @@ if __name__ == '__main__':
     file_type = cnfg['file_type']
     filename = cnfg['file_name']
     discretize = cnfg['discretize']
-    input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(DIM, state, short_output=False)
+
+    cnfgfid = {"heralding_out": False, "imaginary": False}
+    alledges = th.buildAllEdges(DIM)
+    graph = fc.Graph(alledges)
+    fid = fidelity(graph, state, cnfgfid)
+    numargs = len(th.buildAllEdges(DIM))
 
     print("Training Data...")
     if file_type == 'pkl':
-        data = np.zeros((num_of_examples, len(input_graph)))
+        data = np.zeros((num_of_examples, numargs))
         res = np.zeros((num_of_examples, 1))
 
     for ii in range(num_of_examples):
         # generate sample
-        weights, output_fidelity = generatorGraphFidelity(DIM, state, short_output=True,
-                                                          discretize=discretize)
+        weights, output_fidelity = quickgenerate(fid, numargs)
         if file_type == 'csv':  # if csv, write line by line
             with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")
