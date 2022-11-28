@@ -20,6 +20,13 @@ def discretize_weight(weight):
         return -1
 
 
+def thresholded_linear(weight):
+    if abs(weight) < 0.33:
+        return 0
+    else:
+        weight
+
+
 def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_output=True, discretize=False):
     """
     Generates graphs and computes their fidelity with respect to some desired state
@@ -29,7 +36,10 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         alledges = th.buildAllEdges(dimensions)
         randweights = 2 * np.random.rand(len(alledges)) - 1
         if discretize:
-            weights = [discretize_weight(weight) for weight in randweights]
+            if discretize == 'thr_linear':
+                weights = [thresholded_linear(weight) for weight in randweights]
+            else:
+                weights = [discretize_weight(weight) for weight in randweights]
         else:
             weights = randweights
         rand_graph = fc.Graph(alledges, weights=weights)  # full graph
