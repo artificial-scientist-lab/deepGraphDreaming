@@ -8,6 +8,6 @@ modelname: '4q_discrete_seed111.pt'
 start_graph: 'random'
 neuron_array: '[[14,0]]'
 num_start_graphs: 100
-dream_file: 'dreamfiles/discrete_4q_10M.csv'
+dream_file: 'dreamfiles/discrete_4q_10M/dream
 datafile: 'discrete_4q_10M.csv'
 seed: 999
