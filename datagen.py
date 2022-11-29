@@ -70,7 +70,11 @@ def quickgenerate(func, numargs):
             weights = [discretize_weight(weight) for weight in randweights]
     else:
         weights = randweights
-    fidelity = 1 - func(weights)
+    try:
+        fidelity = 1 - func(weights)
+    except ZeroDivisionError:
+        fidelity = 0
+        print(weights, flush=True)
 
     return randweights, fidelity
 
