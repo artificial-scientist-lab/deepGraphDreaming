@@ -40,7 +40,7 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     res = res_full[:]
 else:
     df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
-    data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
+    data = np.array([eval(re.sub(r"  *", ',', graph.replace('\n', '').replace('[ ', '['))) for graph in df['weights']])
     res = df['res'].to_numpy()
 vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(data, res, 0.95)
 best_graph = np.argmax(res_train_np)  # Index pertaining to the graph with the highest fidelity in the dataset
@@ -91,10 +91,12 @@ model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 
 # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
 
-
-*_, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
-start_res = float(res_train_np[ind])
-start_pred = model(torch.tensor(input_graph.weights, dtype=torch.float).to(device)).item()
+if cnfg['start_graph'] == 'zero':
+    fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
+else:
+    fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
+start_res = fid
+start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
 if not os.path.exists(dreamfolder):
     os.makedirs(dreamfolder)
 with open(cnfg['dream_file'], 'a') as f:

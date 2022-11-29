@@ -1,13 +1,13 @@
-state: '0000+1111'
+state: '000000+111111'
 num_of_examples: 10000000
 learnRate: '1.e-4'
 num_of_examples_fixed:
 num_of_epochs: 30000
-nnType: 4
-modelname: '4q_discrete_seed111.pt'
+nnType: 5
+modelname: '6partGHZ_seed111.pt'
 start_graph: 'random'
-neuron_array: '[[14,0]]'
-num_start_graphs: 100
-dream_file: 'dreamfiles/discrete_4q_10M/dream'
-datafile: 'discrete_4q_10M.csv'
+neuron_array: '[[12,i] for i in range(20)]'
+num_start_graphs: 1
+dream_file: 'dreamfiles/dream'
+datafile: 'data_train.pkl'
 seed: 999
