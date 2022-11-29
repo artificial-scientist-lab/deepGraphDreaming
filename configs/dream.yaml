@@ -10,4 +10,4 @@ neuron_array: '[[12,i] for i in range(20)]'
 num_start_graphs: 1
 dream_file: 'dreamfiles/dream'
 datafile: 'data_train.pkl'
-seed: 999
+seed: 888
