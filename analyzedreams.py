@@ -3,7 +3,7 @@ import pandas as pd
 from pytheus import theseus as th, graphplot as gp, fancy_classes as fc
 import numpy as np
 
-directory = 'dreamfiles/dream6q20n'
+directory = 'dreamfiles/dream6q20nzero'
 data = []
 for ii, filename in enumerate(os.listdir(directory)):
     df = pd.read_csv(f'{directory}/{filename}', sep=";", names=['fidelity', 'activation', 'graph'])
@@ -16,7 +16,7 @@ for ii, filename in enumerate(os.listdir(directory)):
     # gp.graphPlot(graph)
     newweights = [w / max(graph.weights) for w in graph.weights]
     newgraph = fc.Graph(edges=graph.edges, weights=newweights)
-    newgraph.purge(threshold=0.3, update=True)
+    newgraph.purge(threshold=0.4, update=True)
     newgraph = fc.Graph(newgraph.edges, weights=newgraph.weights)
     gp.graphPlot(newgraph)
     gp.leiwandPlot(newgraph, name=f'leiwandplots/graph{ii}')
