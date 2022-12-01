@@ -59,7 +59,10 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     res = res_full[0:num_of_examples]
 else:
     df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
-    data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
+    try:
+        data = np.array([graph for graph in df['weights']])
+    except:
+        data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
     res = df['res'].to_numpy()
     data = data[0:num_of_examples]
     res = res[0:num_of_examples]
