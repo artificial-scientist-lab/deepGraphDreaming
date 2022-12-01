@@ -2,10 +2,10 @@ state: '0000+1111'
 
 num_of_examples: '1.e7'
 learnRate: '1.e-3'
-model_prefix: '4q_discrete'
+model_prefix: '4q_thrlin'
 l2Lambda: 0.00001
 isL2Reg: False
 nnType: 4
 batch_size: 10000
-datafile: 'discrete_4q_10M.csv'
+datafile: 'thrlin_4q_10M.csv'
 seed: 111
