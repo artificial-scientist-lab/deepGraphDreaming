@@ -5,9 +5,9 @@ num_of_examples_fixed:
 num_of_epochs: 30000
 nnType: 5
 modelname: '6partGHZ_seed111.pt'
-start_graph: 'random'
+start_graph: 'zero'
 neuron_array: '[[12,i] for i in range(20)]'
 num_start_graphs: 1
-dream_file: 'dreamfiles/dream'
+dream_file: 'dreamfiles/dream6q20nzero'
 datafile: 'data_train.pkl'
 seed: 888
