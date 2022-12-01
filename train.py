@@ -65,8 +65,9 @@ else:
         data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
     res = df['res'].to_numpy()
     data = data[0:num_of_examples]
+    print(data[0])
     res = res[0:num_of_examples]
-
+    print(res[0])
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
 NN_INPUT = len(input_edge_weights)
 NN_OUTPUT = 1
