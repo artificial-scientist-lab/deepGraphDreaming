@@ -123,6 +123,25 @@ class ff_network(nn.Module):
                 nn.ReLU(),
                 nn.Linear(20, size_of_output)
             )
+            
+        if (type == 6): # "Wider but narrower approach" for 4-qubits.
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, 16),
+                    nn.ReLU(),
+                    nn.Linear(16, size_of_output)
+                )
 
     def forward(self, x):
         res = self.mynn(x)

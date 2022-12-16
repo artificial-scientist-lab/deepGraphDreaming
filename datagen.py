@@ -52,7 +52,7 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         fidelity = 0
 
     if short_output:  # array of the edges' weights (includes 0 valued edges) and fidelity
-        return randweights, fidelity
+        return weights, fidelity
     else:  # dictionaries with edges names and values, generated kets, and fidelity
         return rand_graph, rand_state.amplitudes, fidelity
 
@@ -76,7 +76,7 @@ def quickgenerate(func, numargs):
         fidelity = 0
         print(weights, flush=True)
 
-    return randweights, fidelity
+    return weights, fidelity
 
 
 def constructGraph(neoEdgeWeights, dimensions, desired_state):
