@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 
 df = pd.read_csv('data/d4q10m.csv', names=['weights', 'res'], delimiter=";",nrows=10000000)
-#data = np.array([eval(re.sub(r"  *",',',graph.replace('\n', '').replace('[ ','['))) for graph in df['weights']])
 res = df['res'].to_numpy()
 
 

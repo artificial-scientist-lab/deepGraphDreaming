@@ -176,15 +176,17 @@ def load_model(file_name, device, size_of_input, size_of_output, nnType):
     return model
 
 
-def prep_data(data, res, train_test_split):
+def prep_data(data, res, train_test_split, zeroInput = False):
     idx_traintest = int(len(data) * train_test_split)
     vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
     # input_edges_train = input_edges[0:idx_traintest]
     res_train_np = res[0:idx_traintest]  # Output concurrence corresponding to each input graph
-
     vals_test_np = data[idx_traintest:]
     # input_edges_test = input_edges[idx_traintest:]
     res_test_np = res[idx_traintest:]
+    if (zeroInput):
+        vals_train_np=np.zeros(vals_train_np.shape)
+        vals_test_np=np.zeros(vals_test_np.shape)
     return vals_train_np, vals_test_np, res_train_np, res_test_np
 
 
@@ -324,8 +326,8 @@ def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution
     plt.ylabel('loss')
     plt.xlabel('episode')
     plt.legend(loc="lower left")
-    plt.show()
     plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
+    plt.show()
 
 
 def neuron_selector(model, device, layer, neuron):
