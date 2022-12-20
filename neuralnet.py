@@ -128,16 +128,6 @@ class ff_network(nn.Module):
                 self.mynn = nn.Sequential(
                     nn.Linear(size_of_input, size_of_input),
                     nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
                     nn.Linear(size_of_input, 16),
                     nn.ReLU(),
                     nn.Linear(16, size_of_output)
