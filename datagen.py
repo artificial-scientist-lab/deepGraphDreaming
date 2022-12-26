@@ -88,7 +88,7 @@ def constructGraph(neoEdgeWeights, dimensions, desired_state):
     state_neo = graph_neo.state
     state_neo.normalize()
 
-    fidelity = abs(state_neo @ desired_state)
+    fidelity = abs(state_neo @ desired_state) ** 2
 
     return fidelity, graph_neo
 

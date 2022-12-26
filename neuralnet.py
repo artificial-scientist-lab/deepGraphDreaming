@@ -292,9 +292,10 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
             if (time.time() - start_time) > 24 * 60 * 60:
                 print('    Early stopping kicked in: too much time has elasped')
                 break
-    if save_fig:
-        plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-                  vals_train_np)
+
+        if save_fig:
+            plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
+                  vals_train_np,epoch)
 
     print('Best test MSE: ', min(test_loss_evolution))
     print("...DONE")
@@ -304,7 +305,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
 
 def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-              vals_train_np):
+              vals_train_np,epoch):
     plt.plot(train_loss_evolution, label='train')
     plt.clf()
     plt.plot(train_loss_evolution, label='train')
@@ -316,7 +317,7 @@ def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution
     plt.ylabel('loss')
     plt.xlabel('episode')
     plt.legend(loc="lower left")
-    plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
+    plt.savefig('plots/nn_train_results_' + str(num_of_examples) + suffix + '_'+str(epoch)+'.png')
     plt.show()
 
 

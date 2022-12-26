@@ -3,7 +3,7 @@ import pandas as pd
 from pytheus import theseus as th, graphplot as gp, fancy_classes as fc
 import numpy as np
 
-directory = 'dreamfiles/dream6q20nzero'
+directory = 'dreamfiles/dream4q20nzero_888'
 data = []
 for ii, filename in enumerate(os.listdir(directory)):
     df = pd.read_csv(f'{directory}/{filename}', sep=";", names=['fidelity', 'activation', 'graph'])
@@ -11,7 +11,7 @@ for ii, filename in enumerate(os.listdir(directory)):
     startweights = np.array(eval(df.iloc[0, 2]))
     diff = weights - startweights
     data.append([weights, filename])
-    edges = th.buildAllEdges(dimensions=6 * [2])
+    edges = th.buildAllEdges(dimensions=4 * [2])
     graph = fc.Graph(edges=edges, weights=diff)
     # gp.graphPlot(graph)
     newweights = [w / max(graph.weights) for w in graph.weights]
