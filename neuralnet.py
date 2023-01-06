@@ -213,6 +213,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     num_of_examples = int(float(config['num_of_examples']))  # Training set size
     learnRate = float(config['learnRate'])  # Learning rate
     l2Lambda = float(config['l2Lambda'])  # Lambda parameter for L2 Regularization
+    epochToSaturate = float(config['epochToSaturate'])
     nnType = config['nnType']  # What type of neural network do we want to train on
 
     batch_size = min(len(vals_train_np), config['batch_size'])
@@ -294,7 +295,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
                     writer.writerow(
                         [train_loss, test_loss])
 
-            if len(test_loss_evolution) - np.argmin(test_loss_evolution) > 50:
+            if len(test_loss_evolution) - np.argmin(test_loss_evolution) > epochToSaturate: # This was set to 50 in the original code
                 print('    Early stopping kicked in: test loss', np.argmin(test_loss_evolution),
                       len(test_loss_evolution))
                 break
