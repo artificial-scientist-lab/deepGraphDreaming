@@ -61,9 +61,9 @@ def quickgenerate(func, numargs):
     """
     Generates graphs and computes their fidelity with respect to some desired state
     """
-
     randweights = 2 * np.random.rand(numargs) - 1
     if discretize:
+        
         if discretize == 'thr_linear':
             weights = [thresholded_linear(weight) for weight in randweights]
         else:
@@ -118,7 +118,11 @@ if __name__ == '__main__':
     num_of_examples = cnfg['num_of_examples']
     file_type = cnfg['file_type']
     filename = cnfg['file_name']
-    discretize = cnfg['discretize']
+    
+    toBoolean = {'True': True, 'False':False}
+    
+    discretize = toBoolean[cnfg['discretize']]
+    print(discretize)
 
     cnfgfid = {"heralding_out": False, "imaginary": False}
     alledges = th.buildAllEdges(DIM)
@@ -143,6 +147,7 @@ if __name__ == '__main__':
             res[ii] = output_fidelity
         if ii % 1000 == 0:
             print('Training data: ', ii, '/', num_of_examples)
+            print(f'Samnple Weights: {weights}')
 
     if file_type == 'pkl':
         with open(filename + '.pkl', 'wb') as f:
