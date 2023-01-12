@@ -128,12 +128,33 @@ class ff_network(nn.Module):
                 self.mynn = nn.Sequential(
                     nn.Linear(size_of_input, size_of_input),
                     nn.ReLU(),
+                    nn.BatchNorm1d(size_of_input),
                     nn.Linear(size_of_input, 16),
                     nn.ReLU(),
+                    nn.BatchNorm1d(16),
                     nn.Linear(16, size_of_output)
                 )
                 
-        if (type == 7): # "Wider but narrower approach" for 6-qubits.
+        if (type == 7): #  Same neural network, but with duplicate layers
+                        self.mynn = nn.Sequential(
+                            nn.Linear(size_of_input, size_of_input),
+                            nn.ReLU(),
+                            nn.Linear(size_of_input, size_of_input),
+                            nn.ReLU(),
+                            nn.Linear(size_of_input, size_of_input),
+                            nn.ReLU(),
+                            nn.Linear(size_of_input, 16),
+                            nn.ReLU(),
+                            nn.Linear(16,16),
+                            nn.ReLU(),
+                            nn.Linear(16,16),
+                            nn.ReLU(),
+                            nn.Linear(16, 2),
+                            nn.ReLU(),
+                            nn.Linear(2,size_of_output)
+                        )
+                
+        if (type == 8): # "Wider but narrower approach" for 6-qubits.
                         self.mynn = nn.Sequential(
                             nn.Linear(size_of_input, 64),
                             nn.ReLU(),
@@ -141,8 +162,25 @@ class ff_network(nn.Module):
                             nn.ReLU(),
                             nn.Linear(size_of_input, size_of_output)
                         )
-
-
+                        
+        if (type == 9): # Same number of neurons
+                        self.mynn = nn.Sequential(
+                            nn.Linear(size_of_input, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, 64),
+                            nn.ReLU(),
+                            nn.Linear(64, size_of_input),
+                            nn.ReLU(),
+                            nn.Linear(size_of_input, size_of_input),
+                            nn.ReLU(),
+                            nn.Linear(size_of_input, size_of_input),
+                            nn.ReLU(),
+                            nn.Linear(size_of_input, 2),
+                            nn.ReLU(), 
+                            nn.Linear(2,size_of_output))
+                        
     def forward(self, x):
         res = self.mynn(x)
         return res
