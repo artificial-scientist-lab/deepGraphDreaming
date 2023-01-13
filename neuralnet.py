@@ -153,8 +153,36 @@ class ff_network(nn.Module):
                             nn.ReLU(),
                             nn.Linear(2,size_of_output)
                         )
+                        
+        if (type == 8): # Same neural network again, but with more duplicate layers
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, size_of_input),
+                    nn.ReLU(),
+                    nn.Linear(size_of_input, 16),
+                    nn.ReLU(),
+                    nn.Linear(16,16),
+                    nn.ReLU(),
+                    nn.Linear(16,16),
+                    nn.ReLU(),
+                    nn.Linear(16,16),
+                    nn.ReLU(),
+                    nn.Linear(16,16),
+                    nn.ReLU(),
+                    nn.Linear(16, 2),
+                    nn.ReLU(),
+                    nn.Linear(2,size_of_output)
+                    )
+            
                 
-        if (type == 8): # "Wider but narrower approach" for 6-qubits.
+        if (type == 9): # "Wider but narrower approach" for 6-qubits.
                         self.mynn = nn.Sequential(
                             nn.Linear(size_of_input, 64),
                             nn.ReLU(),
@@ -163,7 +191,7 @@ class ff_network(nn.Module):
                             nn.Linear(size_of_input, size_of_output)
                         )
                         
-        if (type == 9): # Same number of neurons
+        if (type == 10): # Same number of neurons
                         self.mynn = nn.Sequential(
                             nn.Linear(size_of_input, 64),
                             nn.ReLU(),
@@ -180,6 +208,35 @@ class ff_network(nn.Module):
                             nn.Linear(size_of_input, 2),
                             nn.ReLU(), 
                             nn.Linear(2,size_of_output))
+                        
+        if (type == 11):  # same kind of neural network, but with more layers
+        
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input, 64),
+                        nn.ReLU(),
+                        nn.Linear(64, 64),
+                        nn.ReLU(),
+                        nn.Linear(64, 64),
+                        nn.ReLU(),
+                        nn.Linear(64, 64),
+                        nn.ReLU(),
+                        nn.Linear(64, 64),
+                        nn.ReLU(),
+                        nn.Linear(64, size_of_input),
+                        nn.ReLU(),
+                        nn.Linear(size_of_input, size_of_input),
+                        nn.ReLU(),
+                        nn.Linear(size_of_input, size_of_input),
+                        nn.ReLU(),
+                        nn.Linear(size_of_input, size_of_input),
+                        nn.ReLU(),
+                        nn.Linear(size_of_input, size_of_input),
+                        nn.ReLU(),
+                        nn.Linear(size_of_input, 2),
+                        nn.ReLU(), 
+                        nn.Linear(2,size_of_output) 
+                        )
+                    
                         
     def forward(self, x):
         res = self.mynn(x)

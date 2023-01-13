@@ -4,7 +4,7 @@ import re
 import matplotlib.pyplot as plt
 
 
-df = pd.read_csv('data/d4q10m.csv', names=['weights', 'res'], delimiter=";",nrows=10000000)
+df = pd.read_csv('distcont_6q_2M.csv', names=['weights', 'res'], delimiter=";")
 res = df['res'].to_numpy()
 
 
