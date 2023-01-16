@@ -6,9 +6,9 @@ num_of_epochs: 30000
 nnType: 8
 modelname: '4q_cont_type8_seed8575.pt'
 start_graph: 'random'
-neuron_array: '[[20,ii] for ii in range(2)]' # The length of this array will determine the number of jobs you should run. 
+neuron_array: '[[10,ii] for ii in range(16)]' # The length of this array will determine the number of jobs you should run. 
 # If you want to dream up 100 random graphs while maximizing the output layer, you would make 100 copies of the same array and have 100 jobs running in parallel
 num_start_graphs: 3
-dream_file: 'dreamfiles/dream4qnrand_penul'
+dream_file: 'dreamfiles/dream4qnrand_tenth'
 datafile: 'distcont_4q_1M.csv'
 seed: 888
