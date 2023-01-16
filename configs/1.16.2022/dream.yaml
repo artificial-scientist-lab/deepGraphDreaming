@@ -1,0 +1,14 @@
+state: '0000+1111'
+num_of_examples: 10000000
+learnRate: '1.e-4'
+num_of_examples_fixed:
+num_of_epochs: 30000
+nnType: 8
+modelname: '4q_cont_type8_seed8575.pt'
+start_graph: 'random'
+neuron_array: '[[22,0] for ii in range(100)]' # The length of this array will determine the number of jobs you should run. 
+# If you want to dream up 100 random graphs while maximizing the output layer, you would make 100 copies of the same array and have 100 jobs running in parallel
+num_start_graphs: 1
+dream_file: 'dreamfiles/dream4qnrand_output'
+datafile: 'dist_4q_1M.csv'
+seed: 888
