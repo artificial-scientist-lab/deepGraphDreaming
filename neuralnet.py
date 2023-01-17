@@ -236,8 +236,32 @@ class ff_network(nn.Module):
                         nn.ReLU(), 
                         nn.Linear(2,size_of_output) 
                         )
+        if (type == 12): # NN Architecture Type #1 suggested by Mario
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input, 20),
+                    nn.ReLU(),
+                    nn.Linear(20,20),
+                    nn.ReLU(),
+                    nn.Linear(20,20),
+                    nn.ReLU(),
+                    nn.Linear(20,size_of_output)
+                    )
+        if (type==13): # NN Architecture Type #2 suggested by Mario
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input, 50),
+                    nn.ReLU(),
+                    nn.Linear(50,40),
+                    nn.ReLU(),
+                    nn.Linear(40,30),
+                    nn.ReLU(),
+                    nn.Linear(30,20),
+                    nn.ReLU(),
+                    nn.Linear(20,10),
+                    nn.ReLU(),
+                    nn.Linear(10,size_of_output)
+                    )
                     
-                        
+            
     def forward(self, x):
         res = self.mynn(x)
         return res
