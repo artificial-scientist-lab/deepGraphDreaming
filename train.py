@@ -92,5 +92,11 @@ print(direc, flush=True)
 stream = open(f'models/config{seed}.yaml', 'w')
 yaml.dump(cnfg, stream)
 
+plotFolder = cnfg['plotFolder']
+
+# Create folder to save plots
+if not os.path.exists(plotFolder):
+        os.makedirs(plotFolder)
+
 train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, direc, model_prefix, cnfg,
             isL2Reg, save_fig=showFig)

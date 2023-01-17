@@ -425,7 +425,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
         if save_fig:
             plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-                  vals_train_np,epoch)
+                  vals_train_np,epoch, cnfg['plotFolder'])
 
     print('Best test MSE: ', min(test_loss_evolution))
     print("...DONE")
@@ -435,7 +435,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
 
 def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-              vals_train_np,epoch):
+              vals_train_np,epoch, plotFolder):
     plt.plot(train_loss_evolution, label='train')
     plt.clf()
     plt.plot(train_loss_evolution, label='train')
@@ -447,7 +447,8 @@ def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution
     plt.ylabel('loss')
     plt.xlabel('episode')
     plt.legend(loc="lower left")
-    plt.savefig('plots/nn_train_results_' + str(num_of_examples) + suffix + '_'+str(epoch)+'.png')
+    print(plotFolder)
+    plt.savefig(plotFolder+'/nn_train_results_' + str(num_of_examples) + '_' + suffix + '_'+str(epoch)+'.png')
     plt.show()
 
 
