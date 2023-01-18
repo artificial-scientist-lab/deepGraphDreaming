@@ -13,7 +13,7 @@ import torch
 import re
 
 from datagen import generatorGraphFidelity, constructGraph
-from neuralnet import prep_data, load_model, dream_model
+from neuralnet import prep_data, load_model, dream_model, neuron_selector
 
 stream = open("configs/dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
@@ -88,6 +88,20 @@ print("Device:", device)
 # Load up our trained neural network
 direc = os.getcwd() + f'/models/{modelname}'
 model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
+
+# Here, we look over our training examples and choose the one
+# which activates the neuron the most.  
+
+startPred = np.zeros(cnfg['num_of_examples'])
+
+if (cnfg['bestExamples']):
+    intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
+    for ii in range(len(vals_train_np)):
+        fids, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], state)
+        # Evaluate starting prediction 
+        startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
+
+    inds = np.argmax(startPred) # Choose the best one to represent our index
 
 # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
 

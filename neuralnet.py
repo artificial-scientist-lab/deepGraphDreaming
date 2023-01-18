@@ -425,7 +425,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
         if save_fig:
             plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-                  vals_train_np,epoch, cnfg['plotFolder'])
+                  vals_train_np,epoch, config['plotFolder'])
 
     print('Best test MSE: ', min(test_loss_evolution))
     print("...DONE")
@@ -475,10 +475,10 @@ def neuron_selector(model, device, layer, neuron):
         new_output_layer.bias[0] = old_output_layer.bias[neuron]
 
     if (layer == 0):
-        print("gobble gobble")
+        print(f"Inverse training on input layer and neuron {neuron}")
         new_model = new_output_layer.to(device)
     else:
-        print(f"gobble gobble {layer}")
+        print(f"Inverse training on layer {layer}, neuron {neuron}")
         middle_model = total_model[:layer - 1]
         new_model = nn.Sequential(*middle_model, nn.ReLU(), new_output_layer).to(device)
 
