@@ -423,7 +423,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
                 print('    Early stopping kicked in: too much time has elasped')
                 break
 
-        if save_fig:
+        if save_fig and epoch % 50 == 0:
             plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
                   vals_train_np,epoch, config['plotFolder'])
 
