@@ -39,8 +39,12 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     data = data_full[:]
     res = res_full[:]
 else:
-    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
-    data = np.array([eval(re.sub(r"  *", ',', graph.replace('\n', '').replace('[ ', '['))) for graph in df['weights']])
+    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";", nrows = 10000)
+    try:
+        data = np.array([eval(graph) for graph in df['weights']])
+    except:
+        data = np.array(
+            [eval(re.sub(r"  *", ',', graph.replace('\n', '').replace('[ ', '['))) for graph in df['weights']])
     res = df['res'].to_numpy()
 vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(data, res, 0.95)
 best_graph = np.argmax(res_train_np)  # Index pertaining to the graph with the highest fidelity in the dataset
@@ -54,6 +58,7 @@ parser.add_argument(dest='ii')
 args = parser.parse_args()
 proc_id = int(args.ii)
 
+print("spiffy" )
 # choose start graph
 start_graph_id = proc_id % num_start_graphs
 if cnfg['start_graph'] == 'best':
@@ -97,18 +102,23 @@ startPred = np.zeros(cnfg['num_of_examples'])
 if (cnfg['bestExamples']):
     intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
     for ii in range(len(vals_train_np)):
-        fids, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], state)
+        fid, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], state)
         # Evaluate starting prediction 
         startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
 
-    inds = np.argmax(startPred) # Choose the best one to represent our index
+    # If best examples is enabled, we choose the graph that triggers the maximum activation on the neuron. 
+    inds = np.argmax(startPred) 
+    print(inds)
+
 
 # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
+
+
 
 if cnfg['start_graph'] == 'zero':
     fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
 else:
-    fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
+    fid, start_graph = constructGraph(vals_train_np[inds], cnfg['dims'], state)
 start_res = fid
 start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
 if not os.path.exists(dreamfolder):
