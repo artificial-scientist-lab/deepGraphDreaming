@@ -10,7 +10,7 @@ from torch import nn
 import matplotlib.pyplot as plt
 
 from datagen import constructGraph
-
+#a
 
 class ff_network(nn.Module):
     def __init__(self, size_of_input, size_of_output, type):
@@ -260,8 +260,70 @@ class ff_network(nn.Module):
                     nn.ReLU(),
                     nn.Linear(10,size_of_output)
                     )
-                    
+        if (type==14): # Smaller neural network of type 13
+                self.mynn = nn.Sequential(
+                     nn.Linear(size_of_input,40),
+                     nn.ReLU(),
+                     nn.Linear(40,30),
+                     nn.ReLU(),
+                     nn.Linear(30,20),
+                     nn.ReLU(),
+                     nn.Linear(20,10),
+                     nn.ReLU(),
+                     nn.Linear(10,size_of_output)
+                      )
+        if (type==15): # Bigger neural network version of type #12
+            self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input,100),
+                    nn.ReLU(),
+                    nn.Linear(100,100),
+                    nn.ReLU(),
+                    nn.Linear(100,100),
+                    nn.ReLU(),
+                    nn.Linear(100,100),
+                    nn.ReLU(),
+                    nn.Linear(100,size_of_output)
+                    )
+        if(type==16): # Double Neurons
+            self.mynn = nn.Sequential(
+                nn.Linear(size_of_input,200),
+                nn.ReLU(),
+                nn.Linear(200,200),
+                nn.ReLU(),
+                nn.Linear(200,200),
+                nn.ReLU(),
+                nn.Linear(200,200),
+                nn.ReLU(),
+                nn.Linear(200,size_of_output)
+                )
             
+        if(type==17): # Triple Neurons
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input,300),
+                    nn.ReLU(),
+                    nn.Linear(300,300),
+                    nn.ReLU(),
+                    nn.Linear(300,300),
+                    nn.ReLU(),
+                    nn.Linear(300,300),
+                    nn.ReLU(),
+                    nn.Linear(300,size_of_output)
+                    )
+                    
+        if(type==18): #Quadruple Neurons
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input,400),
+                    nn.ReLU(),
+                    nn.Linear(400,400),
+                    nn.ReLU(),
+                    nn.Linear(400,400),
+                    nn.ReLU(),
+                    nn.Linear(400,400),
+                    nn.ReLU(),
+                    nn.Linear(400,size_of_output)
+                    )
+                
+                      
     def forward(self, x):
         res = self.mynn(x)
         return res
@@ -295,7 +357,7 @@ def load_model(file_name, device, size_of_input, size_of_output, nnType):
     return model
 
 
-def prep_data(data, res, train_test_split, zeroInput = False):
+def prep_data(data, res, train_test_split, zeroInput = False, randomNoise = False):
     idx_traintest = int(len(data) * train_test_split)
     vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
     # input_edges_train = input_edges[0:idx_traintest]
@@ -306,6 +368,11 @@ def prep_data(data, res, train_test_split, zeroInput = False):
     if (zeroInput):
         vals_train_np=np.zeros(vals_train_np.shape)
         vals_test_np=np.zeros(vals_test_np.shape)
+    if(randomNoise): # Introduce random noise onto the weights of graphs that exhibit high fidelity
+        for ii in range(len(vals_train_np)):
+            if res_train_np[ii] > 0.5:
+                print("High Fidelity Example found! Adding random noise to weights...")
+                vals_train_np[ii] = vals_train_np[ii] +  np.random.uniform(-0.005,0.005,len(vals_train_np[ii]))
     return vals_train_np, vals_test_np, res_train_np, res_test_np
 
 
@@ -362,6 +429,13 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     test_loss_evolution = []
 
     start_time = time.time()
+    
+    
+    # Let's set up an adaptive learnimg rate 
+    
+    lmbda = lambda epoch: config['learnRateFactor']
+    scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer_predictor, lr_lambda=lmbda,verbose=True)
+    lrUpdate = config['epochLRUpdate']
 
     print('Everything prepared, lets train')
 
@@ -419,9 +493,14 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
                       len(test_loss_evolution))
                 break
 
-            if (time.time() - start_time) > 24 * 60 * 60:
+            if (time.time() - start_time) > 72 * 60 * 60:
                 print('    Early stopping kicked in: too much time has elasped')
                 break
+            
+            if epoch % lrUpdate and len(test_loss_evolution) - np.argmin(test_loss_evolution) > lrUpdate:
+                print("The test loss doesn't seem to be changing much, so let's change the learn rate")
+                scheduler.step()
+                
 
         if save_fig and epoch % 50 == 0:
             plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,

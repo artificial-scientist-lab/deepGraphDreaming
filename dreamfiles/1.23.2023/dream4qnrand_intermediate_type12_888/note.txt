@@ -1,5 +1,0 @@
-This is dreaming applied to the neurons in ALL intermediate layers of the [20,20,20] NN. 
-
-neuron_id of 0-19 corresponds to neurons in input layer 
-neuron_id of 20-39 corresponds to neurons in second layer 
-neuron_id of 40-59 corresponds to neurons in penul layer 

@@ -10,6 +10,7 @@ import yaml
 from yaml import Loader
 import csv
 import math
+import argparse
 
 
 def discretize_weight(weight):
@@ -57,13 +58,15 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         return rand_graph, rand_state.amplitudes, fidelity
 
 
-def quickgenerate(func, numargs):
+def quickgenerate(func, numargs, isBinary):
     """
     Generates graphs and computes their fidelity with respect to some desired state
     """
-    randweights = 2 * np.random.rand(numargs) - 1
+    if(isBinary):
+        randweights = np.random.randint(-1,2,size=numargs)
+    else:
+        randweights = 2 * np.random.rand(numargs) - 1
     if discretize:
-        
         if discretize == 'thr_linear':
             weights = [thresholded_linear(weight) for weight in randweights]
         else:
@@ -108,9 +111,15 @@ def edit_graph(graph, upper_bound):
 
 if __name__ == '__main__':
 
-    stream = open("configs/datagen.yaml", 'r')
-    cnfg = yaml.load(stream, Loader=Loader)
+    # parse through slurm array
+    parser = argparse.ArgumentParser()
+    parser.add_argument(dest='ii')
+    args = parser.parse_args()
+    proc_id = int(args.ii)
 
+    stream = open(f"configs/datagen{proc_id}.yaml", 'r')
+    cnfg = yaml.load(stream, Loader=Loader)
+				
     DIM = eval(cnfg['dim'])
     kets = hf.makeState(cnfg['state'])
     state = fc.State(kets, normalize=True)
@@ -118,6 +127,7 @@ if __name__ == '__main__':
     num_of_examples = cnfg['num_of_examples']
     file_type = cnfg['file_type']
     filename = cnfg['file_name']
+    isBinary = False
     
     toBoolean = {'True': True, 'False':False}
     
@@ -137,7 +147,7 @@ if __name__ == '__main__':
 
     for ii in range(num_of_examples):
         # generate sample
-        weights, output_fidelity = quickgenerate(fid, numargs)
+        weights, output_fidelity = quickgenerate(fid, numargs,isBinary)
         if file_type == 'csv':  # if csv, write line by line
             with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")

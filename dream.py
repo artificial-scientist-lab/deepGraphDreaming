@@ -15,6 +15,24 @@ import re
 from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model, neuron_selector
 
+def maxNElems(listor, N):
+    final_max = []
+    tempList = listor
+    
+    for i in range(0,N):
+        maxTemp = 0
+        maxIndex = 0
+        for j in range(len(tempList)):
+            if tempList[j] > maxTemp:
+                maxTemp = tempList[j]
+                maxIndex = j
+                
+        tempList[maxIndex] = 0
+        final_max.append(maxIndex)
+            
+            
+    return final_max
+
 stream = open("configs/dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
@@ -39,7 +57,7 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     data = data_full[:]
     res = res_full[:]
 else:
-    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";", nrows = 10000)
+    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";", nrows=cnfg['num_of_examples_fixed'])
     try:
         data = np.array([eval(graph) for graph in df['weights']])
     except:
@@ -72,6 +90,7 @@ neuron_array = eval(cnfg['neuron_array'])
 neuron_id = neuron_id % len(neuron_array)
 cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
 
+cnfg['dream_file'] += f"_layer{cnfg['layer']}"
 cnfg['dream_file'] += f'_{seed}'
 dreamfolder = cnfg['dream_file']
 cnfg['dream_file'] += f'/dream{start_graph_id}_{neuron_id}.csv'
@@ -97,7 +116,7 @@ model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 # Here, we look over our training examples and choose the one
 # which activates the neuron the most.  
 
-startPred = np.zeros(cnfg['num_of_examples'])
+startPred = np.zeros(len(vals_train_np))
 
 if (cnfg['bestExamples']):
     intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
@@ -107,18 +126,18 @@ if (cnfg['bestExamples']):
         startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
 
     # If best examples is enabled, we choose the graph that triggers the maximum activation on the neuron. 
-    inds = np.argmax(startPred) 
-    print(inds)
-
+    bestInds = maxNElems(startPred,num_start_graphs) 
+    ind = bestInds[start_graph_id]
+    print(ind)
+    print(bestInds) 
+    print(start_graph_id)
 
 # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
-
-
 
 if cnfg['start_graph'] == 'zero':
     fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
 else:
-    fid, start_graph = constructGraph(vals_train_np[inds], cnfg['dims'], state)
+    fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
 start_res = fid
 start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
 if not os.path.exists(dreamfolder):

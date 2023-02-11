@@ -19,7 +19,6 @@ import re
 from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
 
-
 # parse through slurm array
 parser=argparse.ArgumentParser(description='test')
 parser.add_argument('--ii', dest='ii', type=int,
@@ -44,9 +43,11 @@ isL2Reg = float(cnfg['isL2Reg'])  # Do we want to introduce L2 Regularization in
 nnType = cnfg['nnType']  # What type of neural network do we want to train on
 isZero = cnfg['zeroInput']
 showFig = cnfg['showFigure']
+learnRateFac = cnfg['learnRateFactor']
 
 print(f"Let's a go! Number of examples: {num_of_examples}")
-print(f"Learning Rate: {learnRate}")
+print(f"Initial Learning Rate: {learnRate}")
+print(f"Learning Rate Factor: {learnRateFac}")
 
 if 'seed' in cnfg:
     seed = cnfg['seed']
