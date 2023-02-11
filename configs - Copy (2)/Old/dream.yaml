@@ -1,0 +1,13 @@
+state: '0000+1111'
+num_of_examples: 1000000
+learnRate: '1.e-4'
+num_of_examples_fixed:
+num_of_epochs: 30000
+nnType: 6
+modelname: '4q_dist_type6_seed111.pt'
+start_graph: 'zero'
+neuron_array: '[[4,0]]'
+num_start_graphs: 1
+dream_file: 'dreamfiles/dream4q1nzero_dist'
+datafile: 'dist_4q_1M.csv'
+seed: 888

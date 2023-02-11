@@ -1,0 +1,6 @@
+state: '000000+111111'
+dim: '[2] * 6'
+num_of_examples: 500000 #if done in parallel, this is multiplied by the number of jobs
+file_name: 'distcont_6q_1M'
+file_type: 'csv' #choose between csv and pkl
+discretize: 'True'

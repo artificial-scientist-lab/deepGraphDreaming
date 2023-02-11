@@ -497,7 +497,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
                 print('    Early stopping kicked in: too much time has elasped')
                 break
             
-            if epoch % lrUpdate and len(test_loss_evolution) - np.argmin(test_loss_evolution) > lrUpdate:
+            if epoch % lrUpdate == 0 and len(test_loss_evolution) - np.argmin(test_loss_evolution) > lrUpdate:
                 print("The test loss doesn't seem to be changing much, so let's change the learn rate")
                 scheduler.step()
                 

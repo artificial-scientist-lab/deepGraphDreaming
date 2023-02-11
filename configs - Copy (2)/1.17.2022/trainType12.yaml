@@ -1,0 +1,14 @@
+state: '0000+1111'
+
+num_of_examples: '1.e6'
+learnRate: '1.e-3'
+model_prefix: '4q_cont_type_12'
+l2Lambda: 0.00001
+isL2Reg: False
+nnType: 12
+batch_size: 10000
+datafile: 'distcont_4q_1M.csv'
+zeroInput: False
+showFigure: True
+plotFolder: '4q_cont_type_12'
+epochToSaturate: 200
