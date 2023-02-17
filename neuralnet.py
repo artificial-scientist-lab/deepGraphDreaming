@@ -322,8 +322,45 @@ class ff_network(nn.Module):
                     nn.ReLU(),
                     nn.Linear(400,size_of_output)
                     )
+        if(type==19): # smaller neural networks 
+            self.mynn = nn.Sequential(
+                nn.Linear(size_of_input,10),
+                nn.ReLU(),
+                nn.Linear(10,10),
+                nn.ReLU(), 
+                nn.Linear(10,10),
+                nn.ReLU(),
+                nn.Linear(10,10),
+                nn.ReLU(),
+                nn.Linear(10,size_of_output)
+                )
+            
+            if(type==20): # smaller neural networks 
+                self.mynn = nn.Sequential(
+                    nn.Linear(size_of_input,25),
+                    nn.ReLU(),
+                    nn.Linear(25,25),
+                    nn.ReLU(), 
+                    nn.Linear(25,25),
+                    nn.ReLU(),
+                    nn.Linear(25,25),
+                    nn.ReLU(),
+                    nn.Linear(25,size_of_output)
+                    )
                 
-                      
+            if(type==21): # smaller neural networks 
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,50),
+                        nn.ReLU(),
+                        nn.Linear(50,50),
+                        nn.ReLU(), 
+                        nn.Linear(50,50),
+                        nn.ReLU(),
+                        nn.Linear(50,50),
+                        nn.ReLU(),
+                        nn.Linear(50,size_of_output)
+                        )
+                
     def forward(self, x):
         res = self.mynn(x)
         return res
