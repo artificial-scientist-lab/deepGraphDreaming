@@ -1,6 +1,0 @@
-state: '0000+1111'
-
-num_of_examples: '1.e7'
-model_suffix: '4q_cont_type6'
-datafile: 'data/4q_cont.pkl'
-seed: 111
