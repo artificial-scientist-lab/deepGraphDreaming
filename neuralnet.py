@@ -360,6 +360,18 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(50,size_of_output)
                         )
+        if(type==22): # bigger neural network
+                        self.mynn = nn.Sequential(
+                            nn.Linear(size_of_input,800),
+                            nn.ReLU(),
+                            nn.Linear(800,800),
+                            nn.ReLU(), 
+                            nn.Linear(800,800),
+                            nn.ReLU(),
+                            nn.Linear(800,800),
+                            nn.ReLU(),
+                            nn.Linear(800,size_of_output)
+                            )
                 
     def forward(self, x):
         res = self.mynn(x)
