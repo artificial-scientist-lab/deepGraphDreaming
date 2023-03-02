@@ -335,7 +335,7 @@ class ff_network(nn.Module):
                 nn.Linear(10,size_of_output)
                 )
             
-            if(type==20): # smaller neural networks 
+        if(type==20): # smaller neural networks 
                 self.mynn = nn.Sequential(
                     nn.Linear(size_of_input,25),
                     nn.ReLU(),
@@ -348,7 +348,7 @@ class ff_network(nn.Module):
                     nn.Linear(25,size_of_output)
                     )
                 
-            if(type==21): # smaller neural networks 
+        if(type==21): # smaller neural networks 
                     self.mynn = nn.Sequential(
                         nn.Linear(size_of_input,50),
                         nn.ReLU(),
