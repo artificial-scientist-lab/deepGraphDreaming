@@ -81,6 +81,16 @@ else:
     print(data[0], flush=True)
     res = res[0:num_of_examples]
     print(res[0], flush=True)
+    
+# The testing data seems to be performing better than the training data ... it may  have something to do with the
+# manner in which the data is being prepared (the testing data may entirely comprise of graphs with discretized weights)
+# To remove this element, let's shuffle the datasets
+
+shuffleInts = np.arange(0,num_of_examples)
+np.random.shuffle(shuffleInts)
+data = data[shuffleInts]
+res = res[shuffleInts]
+
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95, zeroInput=isZero)
 NN_INPUT = len(input_edge_weights)
 NN_OUTPUT = 1
