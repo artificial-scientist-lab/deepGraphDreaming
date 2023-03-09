@@ -90,6 +90,7 @@ shuffleInts = np.arange(0,num_of_examples)
 np.random.shuffle(shuffleInts)
 data = data[shuffleInts]
 res = res[shuffleInts]
+np.save(f'bestShuffle_{seed}.npy',shuffleInts)
 
 weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95, zeroInput=isZero)
 NN_INPUT = len(input_edge_weights)

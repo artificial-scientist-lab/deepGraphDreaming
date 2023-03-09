@@ -13,6 +13,7 @@ import math
 import argparse
 
 
+
 def discretize_weight(weight):
     if abs(weight) < 0.33:
         return 0
