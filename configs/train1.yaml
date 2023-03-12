@@ -1,0 +1,16 @@
+state: '0000+1111'
+
+num_of_examples: '2.e4'
+learnRate: '1.e-3'
+model_prefix: '4q_typeTest'
+l2Lambda: 0.00001
+isL2Reg: False
+nnType: 2
+batch_size: 10000
+datafile: 'cont_4q_1M.csv'
+zeroInput: False
+showFigure: True
+plotFolder: 'plots/type2_cont'
+epochToSaturate: 25
+learnRateFactor: 1.0
+epochLRUpdate: 25

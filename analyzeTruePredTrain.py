@@ -13,17 +13,10 @@ import torch
 import pandas as pd
 import numpy as np
 import re
-from scipy import stats
-import os
-
-
-os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-
 
 dataset = 'distcont_4q_1M'
-model = '4q_type18_seed3339'
-
-df = pd.read_csv(f'datasets/{dataset}.csv', names=['weights', 'res'], delimiter=";", nrows=1000)
+model = '4q_cont_type18_20M_5_seed3339'
+df = pd.read_csv(f'{dataset}.csv', names=['weights', 'res'], delimiter=";", nrows=100000)
 try:
     weights = np.array([eval(graph) for graph in df['weights']])
 except:
@@ -46,48 +39,36 @@ y_test = []
 #####
 for edge in input_graph.edges:
     input_graph[edge] = 0
-    if len(DIM) == 6:
+    if(len(DIM)==6):
         if edge in [(0, 1, 0, 0), (2, 3, 0, 0), (4, 5, 0, 0), (1, 2, 1, 1), (3, 4, 1, 1), (0, 5, 1, 1)]:
-            input_graph[edge] = 1
-        
-    else:
-        if len(DIM)==4:
-            if edge in [(0, 1, 0, 0), (2, 3, 0, 0), (1, 2, 1, 1), (0, 3, 1, 1)]:
+            input_graph[edge] = 1     
+    else: 
+        if (len(DIM)==4):
+            if edge in [(0,1,0,0),(2,3,0,0),(1,2,1,1),(3,0,1,1)]:
                 input_graph[edge] = 1
-            
-
+        
 
 input_graph.getState()
 input_graph.state.normalize()
 
 # predict fidelity of baseline (which ideally should be 1)
 input = torch.tensor(input_graph.weights, dtype=torch.float).to('cpu')
-x_train.append(float(mod(input)))
-x_test.append(float(mod(input)))
-y_train.append(1)
-y_test.append(1)
+#x_train.append(float(mod(input)))
+#x_test.append(float(mod(input)))
 
 for ii in range(len(result_train)):
     input = torch.tensor(weights_train[ii], dtype=torch.float).to('cpu')
     x_train.append(float(mod(input)))
     y_train.append(result_train[ii])
-
-# We compute the r^2 coefficient of a hypothetical linear fit between model predictions x and ground truths y 
-
-slope, intercept, r_value, p_value, std_err = stats.linregress(x_train, y_train)
-
-print("Results on training data")
-print(f"Slope:{slope}, intercept:{intercept}, r_value:{r_value}")
-
-xLine = np.linspace(np.min(x_train),np.max(x_train))
+    
+xLine = np.linspace(np.min(x_train),np.max(x_train),100)
 plt.scatter(x_train, y_train)
-plt.plot(xLine*slope,xLine)
-plt.title(f'True Fidelity vs. Predicted Fidelity -- 20 M -- 4 Qubits -- Training Data \n r^2 value:{r_value**2}')
+plt.plot(xLine,xLine)
+plt.title('True Fidelity vs. Predicted Fidelity -- 20 M -- 6 Qubits -- Training Data')
 plt.xlabel('Predicted Fidelity')
 plt.ylabel('True Fidelity')
-plt.savefig('R2_Plot_4Q_Train')
+plt.savefig('R2_Plot_6Q_Train')
 plt.clf()
-
 
 # Now do the same for the test data 
 
@@ -97,18 +78,12 @@ for ii in range(len(result_test)):
     y_test.append(result_test[ii])
 
 
-slope, intercept, r_value, p_value, std_err = stats.linregress(x_test, y_test)
-
-print("Results on training data")
-print(f"Slope:{slope}, intercept:{intercept}, r_value:{r_value}")
-
-
 plt.scatter(x_test, y_test,color='red')
-plt.plot(xLine*slope,xLine,color='red')
-plt.title(f'True Fidelity vs. Predicted Fidelity -- 20 M -- 4 Qubits -- Test Data \n r^2 value:{r_value**2}')
+plt.plot(xLine,xLine,color='red')
+plt.title('True Fidelity vs. Predicted Fidelity -- 20 M -- 6 Qubits -- Test Data')
 plt.xlabel('Predicted Fidelity')
 plt.ylabel('True Fidelity')
-plt.savefig('R2_Plot_4Q_Test')
+plt.savefig('R2_Plot_6Q_Test')
 
 
     
