@@ -661,6 +661,10 @@ def dream_model(model, desired_state, start_graph, cnfg):
     # initialize an instance of the model
     optimizer_encoder = torch.optim.Adam([data_train_var], lr=lr)
     interm_model = neuron_selector(model, device, layer_index, neuron_index)
+    # Let's set up an adaptive learnimg rate 
+    lmbda = lambda epoch: cnfg['learnRateFactor']
+    scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer_encoder, lr_lambda=lmbda,verbose=True)
+    lrUpdate = cnfg['epochLRUpdate']
 
     for epoch in range(num_epochs):
 
@@ -696,8 +700,13 @@ def dream_model(model, desired_state, start_graph, cnfg):
             with open(cnfg['dream_file'], 'a') as f:
                 writer = csv.writer(f, delimiter=";")
                 writer.writerow([fidelity, activation, dream_graph.weights])
+                
+                
+        if activation_evolution[-1] - activation_evolution[-lrUpdate] < 1e-7:
+            print('Our predictions arent changing much, so let us adjust the learn rate')
+            scheduler.step()
 
-        if len(gradDec) > 1000:
+        if cnfg['useGrad'] == True and len(gradDec) > 1000:
             if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:
                 print('The gradient is very near zero at this point, stop dreaming at epoch ', epoch)
                 break
@@ -707,5 +716,7 @@ def dream_model(model, desired_state, start_graph, cnfg):
                         'Our predictions arent changing much, maybe our gradient is going back and forth? Stop dreaming at epoch ',
                         epoch)
                     break
-
+    
+    print("Dreaming finished!")
     return 0
+

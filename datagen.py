@@ -59,12 +59,12 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         return rand_graph, rand_state.amplitudes, fidelity
 
 
-def quickgenerate(func, numargs, isBinary):
+def quickgenerate(func, numargs, isZero):
     """
     Generates graphs and computes their fidelity with respect to some desired state
     """
-    if(isBinary):
-        randweights = np.random.randint(-1,2,size=numargs)
+    if(isZero):
+        randweights = np.zeros(numargs)
     else:
         randweights = 2 * np.random.rand(numargs) - 1
     if discretize:
