@@ -696,15 +696,15 @@ def dream_model(model, desired_state, start_graph, cnfg):
             modified_edge_weights = data_train_var.cpu().detach().numpy()
             fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
             activation = interm_model(data_train_var).item()
-            #print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
+            print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:
                 writer = csv.writer(f, delimiter=";")
                 writer.writerow([fidelity, activation, dream_graph.weights])
-                
-                
-        if activation_evolution[-1] - activation_evolution[-lrUpdate] < 1e-7:
-            print('Our predictions arent changing much, so let us adjust the learn rate')
-            scheduler.step()
+                 
+        if epoch % lrUpdate == 0:
+            if len(activation_evolution) - np.argmax(activation_evolution) > lrUpdate:
+                print('Our predictions arent changing much, so let us adjust the learn rate')
+                scheduler.step()
 
         if cnfg['useGrad'] == True and len(gradDec) > 1000:
             if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:
