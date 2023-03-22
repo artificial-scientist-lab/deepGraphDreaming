@@ -4,12 +4,12 @@ learnRate: '1.e-4'
 num_of_examples_fixed: 10000
 num_of_epochs: 20000
 nnType: 18
-modelname: '4q_cont_type18.pt'
+modelname: '4q_type18_seed7503.pt'
 start_graph: 'random'
 neuron_array: '[[8,0]]'  
 num_start_graphs: 100
 dream_file: 'dreamfiles/dream_type18_cont_3'
-datafile: 'cont_4q_20M.csv'
+datafile: 'cont_4q_1M.csv'
 bestExamples: False
 seed: 888
 useGrad: False

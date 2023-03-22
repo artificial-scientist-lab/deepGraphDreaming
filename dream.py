@@ -33,6 +33,7 @@ def maxNElems(listor, N):
             
     return final_max
 
+
 stream = open("configs/dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
@@ -70,83 +71,73 @@ randinds = []
 for ii in range(num_start_graphs):
     randinds.append(random.randint(0, len(res_train_np)))
 
-# parse through slurm array
-parser = argparse.ArgumentParser()
-parser.add_argument(dest='ii')
-args = parser.parse_args()
-proc_id = int(args.ii)
-
 print("spiffy" )
-# choose start graph
-start_graph_id = proc_id % num_start_graphs
-if cnfg['start_graph'] == 'best':
-    ind = best_graph
-else:
-    ind = randinds[start_graph_id]
-
-# choose neuron from array given in config
-neuron_id = proc_id // num_start_graphs
-neuron_array = eval(cnfg['neuron_array'])
-neuron_id = neuron_id % len(neuron_array)
-cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
-
-cnfg['dream_file'] += f"_layer{cnfg['layer']}"
-cnfg['dream_file'] += f'_{seed}'
-dreamfolder = cnfg['dream_file']
-cnfg['dream_file'] += f'/dream{start_graph_id}_{neuron_id}.csv'
-print(cnfg['dream_file'])
-
-kets = hf.makeState(cnfg['state'])
-state = fc.State(kets, normalize=True)
-cnfg['dims'] = th.stateDimensions(state.kets)
-
-# We generate a graph for the purposes of obtaining some additional properties about the graphs we are generating (e.g. we have 24 edge)
-input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(cnfg['dims'], state, num_edges=None,
-                                                                      short_output=False)
-NN_INPUT = len(input_graph.weights)
-NN_OUTPUT = 1
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print("Device:", device)
-
-# Load up our trained neural network
-direc = os.getcwd() + f'/models/{modelname}'
-model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
-
-# Here, we look over our training examples and choose the one
-# which activates the neuron the most.  
-
-startPred = np.zeros(len(vals_train_np))
-
-if (cnfg['bestExamples']):
-    intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
-    for ii in range(len(vals_train_np)):
-        fid, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], state)
-        # Evaluate starting prediction 
-        startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
-
-    # If best examples is enabled, we choose the graph that triggers the maximum activation on the neuron. 
-    bestInds = maxNElems(startPred,num_start_graphs) 
-    ind = bestInds[start_graph_id]
-    print(ind)
-    print(bestInds) 
-    print(start_graph_id)
-
-# We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
-
-if cnfg['start_graph'] == 'zero':
-    fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
-else:
-    fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
-start_res = fid
-start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
-if not os.path.exists(dreamfolder):
-    os.makedirs(dreamfolder)
-with open(cnfg['dream_file'], 'a') as f:
-    writer = csv.writer(f, delimiter=";")
-    writer.writerow([start_res, start_pred, start_graph.weights])
-
-start_time = time.time()
-dream_model(model, state, start_graph, cnfg)
-
-print(f"--- done in {time.time() - start_time} seconds ---")
+for proc_id in range(10):
+    # choose start graph
+    start_graph_id = proc_id % num_start_graphs
+    if cnfg['start_graph'] == 'best':
+        ind = best_graph
+    else:
+        ind = randinds[start_graph_id]
+    
+    # choose neuron from array given in config
+    neuron_id = proc_id // num_start_graphs
+    neuron_array = eval(cnfg['neuron_array'])
+    neuron_id = neuron_id % len(neuron_array)
+    cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
+    cnfg['dream_file'] = f"dreamfiles/dream_type18_cont_3/Layer{cnfg['layer']}/dream{start_graph_id}_{neuron_id}.csv"
+    dreamfolder = f"dreamfiles/dream_type18_cont_3/Layer{cnfg['layer']}"
+    kets = hf.makeState(cnfg['state'])
+    state = fc.State(kets, normalize=True)
+    cnfg['dims'] = th.stateDimensions(state.kets)
+    
+    # We generate a graph for the purposes of obtaining some additional properties about the graphs we are generating (e.g. we have 24 edge)
+    input_graph, ket_amplitudes, output_fidelity = generatorGraphFidelity(cnfg['dims'], state, num_edges=None,
+                                                                          short_output=False)
+    NN_INPUT = len(input_graph.weights)
+    NN_OUTPUT = 1
+    
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("Device:", device)
+    
+    # Load up our trained neural network
+    direc = os.getcwd() + f'/models/{modelname}'
+    model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
+    
+    # Here, we look over our training examples and choose the one
+    # which activates the neuron the most.  
+    
+    startPred = np.zeros(len(vals_train_np))
+    
+    if (cnfg['bestExamples']):
+        intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
+        for ii in range(len(vals_train_np)):
+            fid, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], state)
+            # Evaluate starting prediction 
+            startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
+    
+        # If best examples is enabled, we choose the graph that triggers the maximum activation on the neuron. 
+        bestInds = maxNElems(startPred,num_start_graphs) 
+        ind = bestInds[start_graph_id]
+        print(ind)
+        print(bestInds) 
+        print(start_graph_id)
+    
+    # We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
+    
+    if cnfg['start_graph'] == 'zero':
+        fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
+    else:
+        fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
+    start_res = fid
+    start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
+    if not os.path.exists(dreamfolder):
+        os.makedirs(dreamfolder)
+    with open(cnfg['dream_file'], 'a') as f:
+        writer = csv.writer(f, delimiter=";")
+        writer.writerow([start_res, start_pred, start_graph.weights])
+    
+    start_time = time.time()
+    dream_model(model, state, start_graph, cnfg)
+    
+    print(f"--- done in {time.time() - start_time} seconds ---")
