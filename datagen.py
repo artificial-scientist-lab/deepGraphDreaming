@@ -140,6 +140,7 @@ if __name__ == '__main__':
     graph = fc.Graph(alledges)
     fid = fidelity(graph, state, cnfgfid)
     numargs = len(th.buildAllEdges(DIM))
+    threshold = cnfg['threshold']
 
     print("Training Data...")
     if file_type == 'pkl':
@@ -149,6 +150,8 @@ if __name__ == '__main__':
     for ii in range(num_of_examples):
         # generate sample
         weights, output_fidelity = quickgenerate(fid, numargs,isBinary)
+        while(output_fidelity > threshold):
+            weights, output_fidelity = quickgenerate(fid, numargs,isBinary)
         if file_type == 'csv':  # if csv, write line by line
             with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")
@@ -159,7 +162,6 @@ if __name__ == '__main__':
         if ii % 1000 == 0:
             print('Training data: ', ii, '/', num_of_examples)
             print(f'Samnple Weights: {weights}')
-
     if file_type == 'pkl':
         with open(filename + '.pkl', 'wb') as f:
             pickle.dump([data, res], f)

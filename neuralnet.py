@@ -16,22 +16,8 @@ class ff_network(nn.Module):
     def __init__(self, size_of_input, size_of_output, type):
         super(ff_network, self).__init__()
 
-        if (type == 1):  # small neural network with 5 hidden layers and 30 neurons per layer
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, size_of_output)
-            )
-
-        if (type == 2):  # This was the neural network we had been dreaming with before
+        if (type == 7):  # Biggest neural network. This is the old neural network that 
+        # we had been initially dreaming on back in august. 
             self.mynn = nn.Sequential(
                 nn.Linear(size_of_input, 576 * 2),
                 nn.ReLU(),
@@ -67,212 +53,21 @@ class ff_network(nn.Module):
                 nn.ReLU(),
                 nn.Linear(25 * 2, size_of_output)
             )
-
-        if (type == 3):
-            constantsize = 100
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, size_of_output)
-            )
-
-        if (type == 4):
-            constantsize = 200
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, size_of_output)
-            )
-
-        if (type == 5):
-            constantsize = 200
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, 20),
-                nn.ReLU(),
-                nn.Linear(20, size_of_output)
-            )
             
-        if (type == 6): # "Wider but narrower approach" for 4-qubits.
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.BatchNorm1d(size_of_input),
-                    nn.Linear(size_of_input, 16),
-                    nn.ReLU(),
-                    nn.BatchNorm1d(16),
-                    nn.Linear(16, size_of_output)
-                )
-                
-        if (type == 7): #  Same neural network, but with duplicate layers
-                        self.mynn = nn.Sequential(
-                            nn.Linear(size_of_input, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, 16),
-                            nn.ReLU(),
-                            nn.Linear(16,16),
-                            nn.ReLU(),
-                            nn.Linear(16,16),
-                            nn.ReLU(),
-                            nn.Linear(16, 2),
-                            nn.ReLU(),
-                            nn.Linear(2,size_of_output)
-                        )
-                        
-        if (type == 8): # Same neural network again, but with more duplicate layers
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, size_of_input),
-                    nn.ReLU(),
-                    nn.Linear(size_of_input, 16),
-                    nn.ReLU(),
-                    nn.Linear(16,16),
-                    nn.ReLU(),
-                    nn.Linear(16,16),
-                    nn.ReLU(),
-                    nn.Linear(16,16),
-                    nn.ReLU(),
-                    nn.Linear(16,16),
-                    nn.ReLU(),
-                    nn.Linear(16, 2),
-                    nn.ReLU(),
-                    nn.Linear(2,size_of_output)
-                    )
-            
-                
-        if (type == 9): # "Wider but narrower approach" for 6-qubits.
-                        self.mynn = nn.Sequential(
-                            nn.Linear(size_of_input, 64),
-                            nn.ReLU(),
-                            nn.Linear(64, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, size_of_output)
-                        )
-                        
-        if (type == 10): # Same number of neurons
-                        self.mynn = nn.Sequential(
-                            nn.Linear(size_of_input, 64),
-                            nn.ReLU(),
-                            nn.Linear(64, 64),
-                            nn.ReLU(),
-                            nn.Linear(64, 64),
-                            nn.ReLU(),
-                            nn.Linear(64, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, size_of_input),
-                            nn.ReLU(),
-                            nn.Linear(size_of_input, 2),
-                            nn.ReLU(), 
-                            nn.Linear(2,size_of_output))
-                        
-        if (type == 11):  # same kind of neural network, but with more layers
-        
+        if(type==1): #Quadruple Neurons
                     self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input, 64),
+                        nn.Linear(size_of_input,400),
                         nn.ReLU(),
-                        nn.Linear(64, 64),
+                        nn.Linear(400,400),
                         nn.ReLU(),
-                        nn.Linear(64, 64),
+                        nn.Linear(400,400),
                         nn.ReLU(),
-                        nn.Linear(64, 64),
+                        nn.Linear(400,400),
                         nn.ReLU(),
-                        nn.Linear(64, 64),
-                        nn.ReLU(),
-                        nn.Linear(64, size_of_input),
-                        nn.ReLU(),
-                        nn.Linear(size_of_input, size_of_input),
-                        nn.ReLU(),
-                        nn.Linear(size_of_input, size_of_input),
-                        nn.ReLU(),
-                        nn.Linear(size_of_input, size_of_input),
-                        nn.ReLU(),
-                        nn.Linear(size_of_input, size_of_input),
-                        nn.ReLU(),
-                        nn.Linear(size_of_input, 2),
-                        nn.ReLU(), 
-                        nn.Linear(2,size_of_output) 
+                        nn.Linear(400,size_of_output)
                         )
-        if (type == 12): # NN Architecture Type #1 suggested by Mario
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input, 20),
-                    nn.ReLU(),
-                    nn.Linear(20,20),
-                    nn.ReLU(),
-                    nn.Linear(20,20),
-                    nn.ReLU(),
-                    nn.Linear(20,size_of_output)
-                    )
-        if (type==13): # NN Architecture Type #2 suggested by Mario
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input, 50),
-                    nn.ReLU(),
-                    nn.Linear(50,40),
-                    nn.ReLU(),
-                    nn.Linear(40,30),
-                    nn.ReLU(),
-                    nn.Linear(30,20),
-                    nn.ReLU(),
-                    nn.Linear(20,10),
-                    nn.ReLU(),
-                    nn.Linear(10,size_of_output)
-                    )
-        if (type==14): # Smaller neural network of type 13
-                self.mynn = nn.Sequential(
-                     nn.Linear(size_of_input,40),
-                     nn.ReLU(),
-                     nn.Linear(40,30),
-                     nn.ReLU(),
-                     nn.Linear(30,20),
-                     nn.ReLU(),
-                     nn.Linear(20,10),
-                     nn.ReLU(),
-                     nn.Linear(10,size_of_output)
-                      )
-        if (type==15): # Bigger neural network version of type #12
+
+        if (type==2): # Bigger neural network version of type #12
             self.mynn = nn.Sequential(
                     nn.Linear(size_of_input,100),
                     nn.ReLU(),
@@ -284,71 +79,9 @@ class ff_network(nn.Module):
                     nn.ReLU(),
                     nn.Linear(100,size_of_output)
                     )
-        if(type==16): # Double Neurons
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input,200),
-                nn.ReLU(),
-                nn.Linear(200,200),
-                nn.ReLU(),
-                nn.Linear(200,200),
-                nn.ReLU(),
-                nn.Linear(200,200),
-                nn.ReLU(),
-                nn.Linear(200,size_of_output)
-                )
             
-        if(type==17): # Triple Neurons
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input,300),
-                    nn.ReLU(),
-                    nn.Linear(300,300),
-                    nn.ReLU(),
-                    nn.Linear(300,300),
-                    nn.ReLU(),
-                    nn.Linear(300,300),
-                    nn.ReLU(),
-                    nn.Linear(300,size_of_output)
-                    )
-                    
-        if(type==18): #Quadruple Neurons
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input,400),
-                    nn.ReLU(),
-                    nn.Linear(400,400),
-                    nn.ReLU(),
-                    nn.Linear(400,400),
-                    nn.ReLU(),
-                    nn.Linear(400,400),
-                    nn.ReLU(),
-                    nn.Linear(400,size_of_output)
-                    )
-        if(type==19): # smaller neural networks 
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input,10),
-                nn.ReLU(),
-                nn.Linear(10,10),
-                nn.ReLU(), 
-                nn.Linear(10,10),
-                nn.ReLU(),
-                nn.Linear(10,10),
-                nn.ReLU(),
-                nn.Linear(10,size_of_output)
-                )
-            
-        if(type==20): # smaller neural networks 
-                self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input,25),
-                    nn.ReLU(),
-                    nn.Linear(25,25),
-                    nn.ReLU(), 
-                    nn.Linear(25,25),
-                    nn.ReLU(),
-                    nn.Linear(25,25),
-                    nn.ReLU(),
-                    nn.Linear(25,size_of_output)
-                    )
                 
-        if(type==21): # smaller neural networks 
+        if(type==3): # smaller neural networks 
                     self.mynn = nn.Sequential(
                         nn.Linear(size_of_input,40),
                         nn.ReLU(),
@@ -360,23 +93,49 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(40,size_of_output)
                         )
-        if(type==22): # bigger neural network
-                        self.mynn = nn.Sequential(
-                            nn.Linear(size_of_input,800),
-                            nn.ReLU(),
-                            nn.Linear(800,800),
-                            nn.ReLU(), 
-                            nn.Linear(800,800),
-                            nn.ReLU(),
-                            nn.Linear(800,800),
-                            nn.ReLU(),
-                            nn.Linear(800,size_of_output)
-                            )
-                
+                    
+        if(type==4): # smaller neural networks 
+                       self.mynn = nn.Sequential(
+                           nn.Linear(size_of_input,25),
+                           nn.ReLU(),
+                           nn.Linear(25,25),
+                           nn.ReLU(), 
+                           nn.Linear(25,25),
+                           nn.ReLU(),
+                           nn.Linear(25,25),
+                           nn.ReLU(),
+                           nn.Linear(25,size_of_output)
+                           )
+                    
+        if(type==5): # smaller neural networks 
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,10),
+                        nn.ReLU(),
+                        nn.Linear(10,10),
+                        nn.ReLU(), 
+                        nn.Linear(10,10),
+                        nn.ReLU(),
+                        nn.Linear(10,10),
+                        nn.ReLU(),
+                        nn.Linear(10,size_of_output)
+                        )
+                    
+        if (type==6): # bottleneck approach 
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,1000),
+                        nn.ReLU(),
+                        nn.Linear(1000,10),
+                        nn.ReLU(), 
+                        nn.Linear(10,1000),
+                        nn.ReLU(),
+                        nn.Linear(1000,1000),
+                        nn.ReLU(),
+                        nn.Linear(1000,size_of_output)
+                        )
+                    
     def forward(self, x):
         res = self.mynn(x)
         return res
-
 
 def load_model(file_name, device, size_of_input, size_of_output, nnType):
     """
