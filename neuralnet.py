@@ -16,7 +16,7 @@ class ff_network(nn.Module):
     def __init__(self, size_of_input, size_of_output, type):
         super(ff_network, self).__init__()
 
-        if (type == 7):  # Biggest neural network. This is the old neural network that 
+        if (type == 0):  # Biggest neural network. This is the old neural network that 
         # we had been initially dreaming on back in august. 
             self.mynn = nn.Sequential(
                 nn.Linear(size_of_input, 576 * 2),
@@ -124,14 +124,32 @@ class ff_network(nn.Module):
                     self.mynn = nn.Sequential(
                         nn.Linear(size_of_input,1000),
                         nn.ReLU(),
-                        nn.Linear(1000,10),
+                        nn.Linear(1000,1000),
                         nn.ReLU(), 
+                        nn.Linear(1000,10),
+                        nn.ReLU(),
                         nn.Linear(10,1000),
                         nn.ReLU(),
                         nn.Linear(1000,1000),
                         nn.ReLU(),
                         nn.Linear(1000,size_of_output)
                         )
+                    
+        if (type==7): # bottleneck approach take 2
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,500),
+                        nn.ReLU(),
+                        nn.Linear(500,500),
+                        nn.ReLU(), 
+                        nn.Linear(500,10),
+                        nn.ReLU(),
+                        nn.Linear(10,500),
+                        nn.ReLU(),
+                        nn.Linear(500,500),
+                        nn.ReLU(),
+                        nn.Linear(500,size_of_output)
+                        )
+        
                     
     def forward(self, x):
         res = self.mynn(x)
