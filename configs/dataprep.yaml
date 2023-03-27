@@ -1,5 +1,5 @@
-dataset: 'cont_4q_20M'
-shuffle: 'bestShuffle_7503.npy'
-
-
-
+state: '0000+1111'
+num_of_examples: '3.e6'
+dataset: 'cont_20M_2'
+seed: 4113
+shuffle: 'bestShuffle_4113.npy'
