@@ -15,6 +15,8 @@ import re
 from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model, neuron_selector
 
+# This function obtains the N maximum elements in a list. This is used for dreaming with the best fidelity examples
+ 
 def maxNElems(listor, N):
     final_max = []
     tempList = listor
@@ -39,12 +41,9 @@ cnfg = yaml.load(stream, Loader=Loader)
 learnRate = cnfg['learnRate']  # learning rate of inverse training
 num_of_epochs = cnfg['num_of_epochs']  # for how many epochs should we run the inverse training?
 nnType = cnfg['nnType']  # the type of neural network we wish to examine
-modelname = cnfg['modelname']
+modelname = cnfg['modelname'] # The trained neural network
 num_start_graphs = cnfg['num_start_graphs'] if cnfg['start_graph'] == 'random' else 1
 
-# seed = random.randint(1000, 9999)
-# print(f'seed: {seed}')
-# cnfg['seed'] = seed
 seed = cnfg['seed']
 random.seed(seed)
 
@@ -64,9 +63,11 @@ else:
         data = np.array(
             [eval(re.sub(r"  *", ',', graph.replace('\n', '').replace('[ ', '['))) for graph in df['weights']])
     res = df['res'].to_numpy()
+    
 vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(data, res, 0.95)
 best_graph = np.argmax(res_train_np)  # Index pertaining to the graph with the highest fidelity in the dataset
 randinds = []
+
 for ii in range(num_start_graphs):
     randinds.append(random.randint(0, len(res_train_np)))
 
@@ -76,7 +77,6 @@ parser.add_argument(dest='ii')
 args = parser.parse_args()
 proc_id = int(args.ii)
 
-print("spiffy" )
 # choose start graph
 start_graph_id = proc_id % num_start_graphs
 if cnfg['start_graph'] == 'best':
@@ -132,8 +132,7 @@ if (cnfg['bestExamples']):
     print(bestInds) 
     print(start_graph_id)
 
-# We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
-
+# We proceed to generate an initial set of edges from the dreaming process. 
 if cnfg['start_graph'] == 'zero':
     fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
 else:
