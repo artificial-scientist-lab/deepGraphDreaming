@@ -149,7 +149,33 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(500,size_of_output)
                         )
-        
+                    
+        if (type==8): # bottleneck on the last layer
+                            self.mynn = nn.Sequential(
+                                nn.Linear(size_of_input,400),
+                                nn.ReLU(),
+                                nn.Linear(400,400),
+                                nn.ReLU(), 
+                                nn.Linear(400,400),
+                                nn.ReLU(),
+                                nn.Linear(400,10),
+                                nn.ReLU(),
+                                nn.Linear(10,size_of_output),
+                                )
+                            
+        if (type==9): # bottleneck on the last layer with less neurons
+                                    self.mynn = nn.Sequential(
+                                        nn.Linear(size_of_input,400),
+                                        nn.ReLU(),
+                                        nn.Linear(400,400),
+                                        nn.ReLU(), 
+                                        nn.Linear(400,400),
+                                        nn.ReLU(),
+                                        nn.Linear(400,5),
+                                        nn.ReLU(),
+                                        nn.Linear(5,size_of_output)
+                                        )
+                                    
                     
     def forward(self, x):
         res = self.mynn(x)
