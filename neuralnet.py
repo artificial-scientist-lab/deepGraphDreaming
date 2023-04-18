@@ -175,6 +175,18 @@ class ff_network(nn.Module):
                                         nn.ReLU(),
                                         nn.Linear(5,size_of_output)
                                         )
+        if (type==10): # Bottleneck on last layer with two neurons
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,400), 
+                        nn.ReLU(),
+                        nn.Linear(400,400),
+                        nn.ReLU(),
+                        nn.Linear(400,400),
+                        nn.ReLU(),
+                        nn.Linear(400,2),
+                        nn.ReLU(),
+                        nn.Linear(2,size_of_output)
+                        )
                                     
                     
     def forward(self, x):
@@ -442,7 +454,9 @@ def dream_model(model, desired_state, start_graph, cnfg):
     num_epochs = cnfg['num_of_epochs']
     layer_index = cnfg['layer']
     neuron_index = cnfg['neuron']
-
+    alpha = cnfg['L1Alpha'] # positive real coefficent for L1 Regularization
+     
+    print(f"alpha: {alpha}")
     loss_prediction = []
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     prop = 1
@@ -474,12 +488,13 @@ def dream_model(model, desired_state, start_graph, cnfg):
         # feedforward step
         activation = interm_model(data_train_var)
         activation_evolution.append(activation.cpu().detach().numpy())
-
+        
+        # Towards computing L1 Regularization, we extract information about the absolute value of the weights
+        edge_weights = data_train_var.cpu().detach().numpy()
+        
         # mean squared error between target and calculated property
         activation = activation.reshape(1)
-        # criterion = nn.MSELoss()
-        # real_loss=criterion(activation, data_train_prop) # So we calculate the mean squared error between the predicted fidelity and the target one
-        real_loss = -activation
+        real_loss = -activation + alpha*np.sum(np.abs(edge_weights))
         loss = torch.clamp(real_loss, min=-50000, max=50000.).double()
         # backpropagation step
 
