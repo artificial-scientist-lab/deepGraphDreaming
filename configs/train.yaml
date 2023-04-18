@@ -2,15 +2,15 @@ state: '0000+1111'
 
 num_of_examples: '2.e7'
 learnRate: '1.e-3'
-model_prefix: '4q_400'
+model_prefix: '4q_bn_last3'
 l2Lambda: 0.00001
 isL2Reg: False
-nnType: 1
-batch_size: 10000
+nnType: 10
+batch_size: 2500
 datafile: 'cont_20M.csv'
 zeroInput: False
 showFigure: True
-plotFolder: 'plots/400_cont_2'
+plotFolder: 'plots/bn_last3'
 epochToSaturate: 99999
-learnRateFactor: 1.0
+learnRateFactor: 0.95
 epochLRUpdate: 25

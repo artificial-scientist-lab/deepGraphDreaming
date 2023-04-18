@@ -81,8 +81,10 @@ proc_id = int(args.ii)
 start_graph_id = proc_id % num_start_graphs
 if cnfg['start_graph'] == 'best':
     ind = best_graph
-else:
+elif cnfg['start_graph'] == 'random':
     ind = randinds[start_graph_id]
+else:
+    ind = start_graph_id
 
 # choose neuron from array given in config
 neuron_id = proc_id // num_start_graphs

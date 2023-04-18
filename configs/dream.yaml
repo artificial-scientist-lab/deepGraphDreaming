@@ -1,20 +1,21 @@
 state: '0000+1111'
-num_of_examples: 2.0e7
+num_of_examples: 1.0e6
 learnRate: '1.e-4'
 num_of_examples_fixed: 10000
-num_of_epochs: 20000
-nnType: 18
-modelname: '4q_type18_seed7503.pt'
-start_graph: 'zero'
-neuron_array: '[[2,i] for i in range(0,400,40)] + [[4,i] for i in range(0,400,40)] + [[6,i] for i in range(0,400,40)] + [[8,0]]'  
-num_start_graphs: 1
-dream_file: 'dreamfiles/dream_type18_cont_3'
-datafile: 'cont_4q_20M.csv'
+num_of_epochs: 50000
+nnType: 10
+modelname: '4q_bn_last3_seed5922.pt'
+start_graph: 'first'
+neuron_array: '[[8,0]]'  
+num_start_graphs: 100
+dream_file: 'dreamfiles/dream_bn_last3_L1'
+datafile: 'cont_4q_1M.csv'
 bestExamples: False
 seed: 888
 useGrad: False
-learnRateFactor: 1.00
+learnRateFactor: 1.0
 epochLRUpdate: 25
+L1Alpha: 0.90
 
 
 
