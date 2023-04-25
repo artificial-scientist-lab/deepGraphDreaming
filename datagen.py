@@ -5,7 +5,7 @@ import numpy as np
 import pytheus.help_functions as hf
 import pytheus.fancy_classes as fc
 from pytheus import theseus as th
-from pytheus.lossfunctions import fidelity
+from pytheus.lossfunctions import fidelity, make_lossString_entanglement
 import yaml
 from yaml import Loader
 import csv
@@ -75,7 +75,7 @@ def quickgenerate(func, numargs, isZero):
     else:
         weights = randweights
     try:
-        fidelity = 1 - func(weights)
+        fidelity = 1 - func(weights) # why do we do this again? 
     except ZeroDivisionError:
         fidelity = 0
         print(weights, flush=True)
@@ -124,6 +124,7 @@ if __name__ == '__main__':
     DIM = eval(cnfg['dim'])
     kets = hf.makeState(cnfg['state'])
     state = fc.State(kets, normalize=True)
+    sysDict = hf.get_sysdict(DIM)
     print(state)
     num_of_examples = cnfg['num_of_examples']
     file_type = cnfg['file_type']
@@ -138,7 +139,10 @@ if __name__ == '__main__':
     cnfgfid = {"heralding_out": False, "imaginary": False}
     alledges = th.buildAllEdges(DIM)
     graph = fc.Graph(alledges)
-    fid = fidelity(graph, state, cnfgfid)
+    if(cnfg['prop'] == 'concurrence'): # Computes the concurrence of a random graph
+        fid = make_lossString_entanglement(graph,sysDict)
+    else: # Computes the fidelity, though this can be reconfigured for any other quantum property we wanna measure
+        fid = fidelity(graph,state,cnfgfid)
     numargs = len(th.buildAllEdges(DIM))
     threshold = cnfg['threshold']
 
