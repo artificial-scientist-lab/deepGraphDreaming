@@ -187,6 +187,20 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(2,size_of_output)
                         )
+        if (type==11): # Just in case we need to look at something else
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input, 100),
+                        nn.ReLU(),
+                        nn.Linear(100,100),
+                        nn.ReLU(),
+                        nn.Linear(100,100),
+                        nn.ReLU(),
+                        nn.Linear(100,100),
+                        nn.ReLU(),
+                        nn.Linear(100,10),
+                        nn.ReLU(),
+                        nn.Linear(10,size_of_output)
+                        )
                                     
                     
     def forward(self, x):
