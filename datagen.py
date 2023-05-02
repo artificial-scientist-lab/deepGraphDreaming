@@ -83,7 +83,7 @@ def quickgenerate(func, numargs, isZero):
     return weights, fidelity
 
 
-def constructGraph(neoEdgeWeights, dimensions, desired_state):
+def constructGraph(neoEdgeWeights, dimensions, func):
     # We update our graph now with potentially new weight values and recompute the fidelity
     graph_neo = th.buildAllEdges(dimensions)
     neoEdgeWeights = [float(item) for item in neoEdgeWeights]
@@ -92,7 +92,7 @@ def constructGraph(neoEdgeWeights, dimensions, desired_state):
     state_neo = graph_neo.state
     state_neo.normalize()
 
-    fidelity = abs(state_neo @ desired_state) ** 2
+    fidelity = func(neoEdgeWeights)
 
     return fidelity, graph_neo
 

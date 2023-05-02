@@ -11,6 +11,7 @@ import csv
 import pandas as pd
 import torch
 import re
+from pytheus.lossfunctions import fidelity, make_lossString_entanglement
 
 from datagen import generatorGraphFidelity, constructGraph
 from neuralnet import prep_data, load_model, dream_model, neuron_selector
@@ -119,11 +120,18 @@ model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 # which activates the neuron the most.  
 
 startPred = np.zeros(len(vals_train_np))
+sysDict = hf.get_sysdict(cnfg['dims'])
+cnfgfid = {"heralding_out": False, "imaginary": False}
+
+if(cnfg['prop'] == 'concurrence'): # Computes the concurrence of a random graph
+    fid = make_lossString_entanglement(input_graph,sysDict)
+else: # Computes the fidelity, though this can be reconfigured for any other quantum property we wanna measure
+    fid = fidelity(input_graph,state,cnfgfid)
 
 if (cnfg['bestExamples']):
     intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
     for ii in range(len(vals_train_np)):
-        fid, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], state)
+        fid, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], fid)
         # Evaluate starting prediction 
         startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
 
@@ -136,10 +144,10 @@ if (cnfg['bestExamples']):
 
 # We proceed to generate an initial set of edges from the dreaming process. 
 if cnfg['start_graph'] == 'zero':
-    fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
+    fidel, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], fid)
 else:
-    fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
-start_res = fid
+    fidel, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], fid)
+start_res = fidel
 start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
 if not os.path.exists(dreamfolder):
     os.makedirs(dreamfolder)

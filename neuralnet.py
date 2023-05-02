@@ -444,7 +444,7 @@ def neuron_selector(model, device, layer, neuron):
     return new_model
 
 
-def dream_model(model, desired_state, start_graph, cnfg):
+def dream_model(model, desired_state, start_graph, cnfg, func):
     """
     Inverse trains the model by freezing the weights and biases and optimizing instead for the input.
     In particular, we want to find the input that maximizes our output from whatever neuron we are interested in looking over
@@ -526,7 +526,7 @@ def dream_model(model, desired_state, start_graph, cnfg):
         if epoch % 100 == 0:
             # We update our graph now with potentially new weight values and recompute the fidelity
             modified_edge_weights = data_train_var.cpu().detach().numpy()
-            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
+            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, func)
             activation = interm_model(data_train_var).item()
             print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:
