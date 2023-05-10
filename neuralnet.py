@@ -201,8 +201,20 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(10,size_of_output)
                         )
+            
+        if (type==12): # This is meant to train concurrence
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input, 800),
+                        nn.ReLU(), 
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(), 
+                        nn.Linear(800, 800),
+                        nn.ReLU(),
+                        nn.Linear(800,size_of_output)
+                        )
                                     
-                    
     def forward(self, x):
         res = self.mynn(x)
         return res
@@ -236,22 +248,32 @@ def load_model(file_name, device, size_of_input, size_of_output, nnType):
 
 
 def prep_data(data, res, train_test_split, zeroInput = False, randomNoise = False):
-    idx_traintest = int(len(data) * train_test_split)
-    vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
-    # input_edges_train = input_edges[0:idx_traintest]
-    res_train_np = res[0:idx_traintest]  # Output concurrence corresponding to each input graph
-    vals_test_np = data[idx_traintest:]
-    # input_edges_test = input_edges[idx_traintest:]
-    res_test_np = res[idx_traintest:]
-    if (zeroInput):
-        vals_train_np=np.zeros(vals_train_np.shape)
-        vals_test_np=np.zeros(vals_test_np.shape)
-    if(randomNoise): # Introduce random noise onto the weights of graphs that exhibit high fidelity
-        for ii in range(len(vals_train_np)):
-            if res_train_np[ii] > 0.5:
-                print("High Fidelity Example found! Adding random noise to weights...")
-                vals_train_np[ii] = vals_train_np[ii] +  np.random.uniform(-0.005,0.005,len(vals_train_np[ii]))
-    return vals_train_np, vals_test_np, res_train_np, res_test_np
+    # If the dataset is really small (e.g. a single graph example), then just spit back the input-output pair
+    if(len(data)==1):
+        vals_train_np = data
+        vals_test_np = data
+        res_train_np = res
+        res_test_np = res
+        return vals_train_np, vals_test_np, res_train_np, res_test_np
+    
+    else:
+        idx_traintest = int(len(data) * train_test_split)
+        vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
+        # input_edges_train = input_edges[0:idx_traintest]
+        res_train_np = res[0:idx_traintest]  # Output concurrence corresponding to each input graph
+        vals_test_np = data[idx_traintest:]
+        # input_edges_test = input_edges[idx_traintest:]
+        res_test_np = res[idx_traintest:]
+        if (zeroInput):
+            vals_train_np=np.zeros(vals_train_np.shape)
+            vals_test_np=np.zeros(vals_test_np.shape)
+        if(randomNoise): # Introduce random noise onto the weights of graphs that exhibit high fidelity
+            for ii in range(len(vals_train_np)):
+                if res_train_np[ii] > 0.5:
+                    print("High Fidelity Example found! Adding random noise to weights...")
+                    vals_train_np[ii] = vals_train_np[ii] +  np.random.uniform(-0.005,0.005,len(vals_train_np[ii]))
+    
+        return vals_train_np, vals_test_np, res_train_np, res_test_np
 
 
 def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals_test_np, res_test_np, save_direc,
@@ -526,7 +548,7 @@ def dream_model(model, desired_state, start_graph, cnfg, func):
         if epoch % 100 == 0:
             # We update our graph now with potentially new weight values and recompute the fidelity
             modified_edge_weights = data_train_var.cpu().detach().numpy()
-            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, func)
+            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, func, cnfg['prop'])
             activation = interm_model(data_train_var).item()
             print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:

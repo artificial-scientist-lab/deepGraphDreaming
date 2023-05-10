@@ -75,7 +75,7 @@ def quickgenerate(func, numargs, isZero):
     else:
         weights = randweights
     try:
-        fidelity = 1 - func(weights) # why do we do this again? 
+        fidelity = 1 - func(weights)  
     except ZeroDivisionError:
         fidelity = 0
         print(weights, flush=True)
@@ -83,16 +83,23 @@ def quickgenerate(func, numargs, isZero):
     return weights, fidelity
 
 
-def constructGraph(neoEdgeWeights, dimensions, func):
+def constructGraph(neoEdgeWeights, dimensions, func, prop):
+    
     # We update our graph now with potentially new weight values and recompute the fidelity
+    
     graph_neo = th.buildAllEdges(dimensions)
     neoEdgeWeights = [float(item) for item in neoEdgeWeights]
     graph_neo = fc.Graph(graph_neo, weights=neoEdgeWeights)
     graph_neo.getState()
     state_neo = graph_neo.state
     state_neo.normalize()
-
-    fidelity = func(neoEdgeWeights)
+    
+    # Function changes depending on the desired property 
+    
+    if (prop == 'concurrence'):
+        fidelity = func(neoEdgeWeights)
+    else:
+        fidelity = 1 - func(neoEdgeWeights)
 
     return fidelity, graph_neo
 
@@ -106,7 +113,6 @@ def edit_graph(graph, upper_bound):
             graph[edge] = 1
         elif (graph[edge] < -1):
             graph[edge] = -1
-
     return graph
 
 

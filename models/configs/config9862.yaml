@@ -1,0 +1,16 @@
+batch_size: 10000
+datafile: cont_20M.csv
+epochLRUpdate: 25
+epochToSaturate: 99999
+isL2Reg: false
+l2Lambda: 1.0e-05
+learnRate: '1.e-3'
+learnRateFactor: 1.0
+model_prefix: 4q_400
+nnType: 1
+num_of_examples: 2.e7
+plotFolder: plots/400_cont_2
+seed: 9862
+showFigure: true
+state: 0000+1111
+zeroInput: false
