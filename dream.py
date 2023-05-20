@@ -156,6 +156,6 @@ with open(cnfg['dream_file'], 'a') as f:
     writer.writerow([start_res, start_pred, start_graph.weights])
 
 start_time = time.time()
-dream_model(model, state, start_graph, cnfg)
+dream_model(model, state, start_graph, cnfg, fid)
 
 print(f"--- done in {time.time() - start_time} seconds ---")

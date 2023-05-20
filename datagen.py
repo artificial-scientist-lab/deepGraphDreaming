@@ -59,10 +59,11 @@ def generatorGraphFidelity(dimensions, desired_state, num_edges=None, short_outp
         return rand_graph, rand_state.amplitudes, fidelity
 
 
-def quickgenerate(func, numargs, isZero):
+def quickgenerate(func, numargs, isZero, prop):
     """
     Generates graphs and computes their fidelity with respect to some desired state
     """
+    
     if(isZero):
         randweights = np.zeros(numargs)
     else:
@@ -74,11 +75,20 @@ def quickgenerate(func, numargs, isZero):
             weights = [discretize_weight(weight) for weight in randweights]
     else:
         weights = randweights
-    try:
-        fidelity = 1 - func(weights)  
-    except ZeroDivisionError:
-        fidelity = 0
-        print(weights, flush=True)
+    
+    
+    if(prop == 'concurrence'):
+        try:
+            fidelity = func(weights)  
+        except ZeroDivisionError:
+            fidelity = 0
+            print(weights, flush=True)
+    else:
+        try:
+            fidelity= 1 - func(weights)  
+        except ZeroDivisionError:
+            fidelity = 0
+            print(weights, flush=True)
 
     return weights, fidelity
 
@@ -153,15 +163,17 @@ if __name__ == '__main__':
     threshold = cnfg['threshold']
 
     print("Training Data...")
+    
     if file_type == 'pkl':
         data = np.zeros((num_of_examples, numargs))
         res = np.zeros((num_of_examples, 1))
 
     for ii in range(num_of_examples):
         # generate sample
-        weights, output_fidelity = quickgenerate(fid, numargs,isBinary)
+        weights, output_fidelity = quickgenerate(fid, numargs,isBinary, cnfg['prop'])
         while(output_fidelity > threshold):
-            weights, output_fidelity = quickgenerate(fid, numargs,isBinary)
+            weights, output_fidelity = quickgenerate(fid, numargs,isBinary, cnfg['prop'])
+            
         if file_type == 'csv':  # if csv, write line by line
             with open(filename + '.csv', 'a') as f:
                 writer = csv.writer(f, delimiter=";")

@@ -214,6 +214,31 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(800,size_of_output)
                         )
+                    
+        if (type==13): # Just to see that trend of increasing entropy layer by layer [49,49,49,49,49,49,49,49,49,49]
+                            self.mynn = nn.Sequential(
+                                nn.Linear(size_of_input, 49),
+                                nn.ReLU(), 
+                                nn.Linear(49,49),
+                                nn.ReLU(),
+                                nn.Linear(49,49),
+                                nn.ReLU(), 
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49,size_of_output)
+                                )
                                     
     def forward(self, x):
         res = self.mynn(x)
