@@ -1,0 +1,7 @@
+num_of_examples: '2.e7'
+model: '4q_400_seed9862'
+dataTest: 'cont_20M_test_9862'
+dataTrain: 'cont_4q_1M'
+shuffle: 'bestShuffle_9862.npy'
+nnType: 1
+name: '[400,400,400,400]'
