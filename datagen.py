@@ -79,7 +79,7 @@ def quickgenerate(func, numargs, isZero, prop):
     
     if(prop == 'concurrence'):
         try:
-            fidelity = func(weights)  
+            fidelity = 1 -  func(weights)  
         except ZeroDivisionError:
             fidelity = 0
             print(weights, flush=True)
@@ -104,12 +104,7 @@ def constructGraph(neoEdgeWeights, dimensions, func, prop):
     state_neo = graph_neo.state
     state_neo.normalize()
     
-    # Function changes depending on the desired property 
-    
-    if (prop == 'concurrence'):
-        fidelity = func(neoEdgeWeights)
-    else:
-        fidelity = 1 - func(neoEdgeWeights)
+    fidelity = 1 - func(neoEdgeWeights) # This should be what you do for both fidelity AND concurrence
 
     return fidelity, graph_neo
 

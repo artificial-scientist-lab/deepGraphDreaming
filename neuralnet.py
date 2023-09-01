@@ -16,44 +16,6 @@ class ff_network(nn.Module):
     def __init__(self, size_of_input, size_of_output, type):
         super(ff_network, self).__init__()
 
-        if (type == 0):  # Biggest neural network. This is the old neural network that 
-        # we had been initially dreaming on back in august. 
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, 576 * 2),
-                nn.ReLU(),
-                nn.Linear(576 * 2, 200 * 2),
-                nn.ReLU(),
-                nn.Linear(200 * 2, 100 * 2),
-                nn.ReLU(),
-                nn.Linear(100 * 2, 50 * 2),
-                nn.ReLU(),
-                nn.Linear(50 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 25 * 2),
-                nn.ReLU(),
-                nn.Linear(25 * 2, size_of_output)
-            )
-            
         if(type==1): #Quadruple Neurons
                     self.mynn = nn.Sequential(
                         nn.Linear(size_of_input,400),
@@ -66,91 +28,9 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(400,size_of_output)
                         )
-
-        if (type==2): # Bigger neural network version of type #12
-            self.mynn = nn.Sequential(
-                    nn.Linear(size_of_input,100),
-                    nn.ReLU(),
-                    nn.Linear(100,100),
-                    nn.ReLU(),
-                    nn.Linear(100,100),
-                    nn.ReLU(),
-                    nn.Linear(100,100),
-                    nn.ReLU(),
-                    nn.Linear(100,size_of_output)
-                    )
-            
-                
-        if(type==3): # smaller neural networks 
-                    self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input,40),
-                        nn.ReLU(),
-                        nn.Linear(40,40),
-                        nn.ReLU(), 
-                        nn.Linear(40,40),
-                        nn.ReLU(),
-                        nn.Linear(40,40),
-                        nn.ReLU(),
-                        nn.Linear(40,size_of_output)
-                        )
                     
-        if(type==4): # smaller neural networks 
-                       self.mynn = nn.Sequential(
-                           nn.Linear(size_of_input,25),
-                           nn.ReLU(),
-                           nn.Linear(25,25),
-                           nn.ReLU(), 
-                           nn.Linear(25,25),
-                           nn.ReLU(),
-                           nn.Linear(25,25),
-                           nn.ReLU(),
-                           nn.Linear(25,size_of_output)
-                           )
                     
-        if(type==5): # smaller neural networks 
-                    self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input,10),
-                        nn.ReLU(),
-                        nn.Linear(10,10),
-                        nn.ReLU(), 
-                        nn.Linear(10,10),
-                        nn.ReLU(),
-                        nn.Linear(10,10),
-                        nn.ReLU(),
-                        nn.Linear(10,size_of_output)
-                        )
-                    
-        if (type==6): # bottleneck approach 
-                    self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input,1000),
-                        nn.ReLU(),
-                        nn.Linear(1000,1000),
-                        nn.ReLU(), 
-                        nn.Linear(1000,10),
-                        nn.ReLU(),
-                        nn.Linear(10,1000),
-                        nn.ReLU(),
-                        nn.Linear(1000,1000),
-                        nn.ReLU(),
-                        nn.Linear(1000,size_of_output)
-                        )
-                    
-        if (type==7): # bottleneck approach take 2
-                    self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input,500),
-                        nn.ReLU(),
-                        nn.Linear(500,500),
-                        nn.ReLU(), 
-                        nn.Linear(500,10),
-                        nn.ReLU(),
-                        nn.Linear(10,500),
-                        nn.ReLU(),
-                        nn.Linear(500,500),
-                        nn.ReLU(),
-                        nn.Linear(500,size_of_output)
-                        )
-                    
-        if (type==8): # bottleneck on the last layer
+        if (type==2): # bottleneck on the last layer
                             self.mynn = nn.Sequential(
                                 nn.Linear(size_of_input,400),
                                 nn.ReLU(),
@@ -163,46 +43,8 @@ class ff_network(nn.Module):
                                 nn.Linear(10,size_of_output),
                                 )
                             
-        if (type==9): # bottleneck on the last layer with less neurons
-                                    self.mynn = nn.Sequential(
-                                        nn.Linear(size_of_input,400),
-                                        nn.ReLU(),
-                                        nn.Linear(400,400),
-                                        nn.ReLU(), 
-                                        nn.Linear(400,400),
-                                        nn.ReLU(),
-                                        nn.Linear(400,5),
-                                        nn.ReLU(),
-                                        nn.Linear(5,size_of_output)
-                                        )
-        if (type==10): # Bottleneck on last layer with two neurons
-                    self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input,400), 
-                        nn.ReLU(),
-                        nn.Linear(400,400),
-                        nn.ReLU(),
-                        nn.Linear(400,400),
-                        nn.ReLU(),
-                        nn.Linear(400,2),
-                        nn.ReLU(),
-                        nn.Linear(2,size_of_output)
-                        )
-        if (type==11): # Just in case we need to look at something else
-                    self.mynn = nn.Sequential(
-                        nn.Linear(size_of_input, 100),
-                        nn.ReLU(),
-                        nn.Linear(100,100),
-                        nn.ReLU(),
-                        nn.Linear(100,100),
-                        nn.ReLU(),
-                        nn.Linear(100,100),
-                        nn.ReLU(),
-                        nn.Linear(100,10),
-                        nn.ReLU(),
-                        nn.Linear(10,size_of_output)
-                        )
-            
-        if (type==12): # This is meant to train concurrence
+                    
+        if (type==3): # This is meant to train concurrence
                     self.mynn = nn.Sequential(
                         nn.Linear(size_of_input, 800),
                         nn.ReLU(), 
@@ -210,12 +52,19 @@ class ff_network(nn.Module):
                         nn.ReLU(),
                         nn.Linear(800,800),
                         nn.ReLU(), 
-                        nn.Linear(800, 800),
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
                         nn.ReLU(),
                         nn.Linear(800,size_of_output)
                         )
+
                     
-        if (type==13): # Just to see that trend of increasing entropy layer by layer [49,49,49,49,49,49,49,49,49,49]
+        if (type==4): # [49^10 Feedforward architecture]
                             self.mynn = nn.Sequential(
                                 nn.Linear(size_of_input, 49),
                                 nn.ReLU(), 
@@ -239,6 +88,65 @@ class ff_network(nn.Module):
                                 nn.ReLU(),
                                 nn.Linear(49,size_of_output)
                                 )
+                            
+        if (type==15): # Very long neural network, [36^26]
+        
+                        self.mynn = nn.Sequential(
+                            nn.Linear(size_of_input, 36),
+                            nn.ELU(), 
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,size_of_output)
+                            )
+
                                     
     def forward(self, x):
         res = self.mynn(x)
@@ -573,12 +481,20 @@ def dream_model(model, desired_state, start_graph, cnfg, func):
         if epoch % 100 == 0:
             # We update our graph now with potentially new weight values and recompute the fidelity
             modified_edge_weights = data_train_var.cpu().detach().numpy()
-            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, func, cnfg['prop'])
+            print(modified_edge_weights)
+            try:
+                fidelity = func(modified_edge_weights)  
+                print(fidelity)
+            except ZeroDivisionError:
+                fidelity = 0
+                print(modified_edge_weights, flush=True)
+            #fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, func, cnfg['prop'])
+            weights = [float(item) for item in modified_edge_weights]
             activation = interm_model(data_train_var).item()
             print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:
                 writer = csv.writer(f, delimiter=";")
-                writer.writerow([fidelity, activation, dream_graph.weights])
+                writer.writerow([fidelity, activation, weights])
                  
         if epoch % lrUpdate == 0:
             if len(activation_evolution) - np.argmax(activation_evolution) > lrUpdate:
