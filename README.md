@@ -6,7 +6,7 @@
 * `train.py` trains initial NN
 * `dream.py` starts dreaming for a given model
 * `datagen.py` functions for generating data
-* `predict.ipynb` to load and analyze models by hand
+* `AnalyzeDream.ipynb` to load and analyze dreaming data by hand
 
 ### setting up on the cluster
 
