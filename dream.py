@@ -36,7 +36,7 @@ def maxNElems(listor, N):
             
     return final_max
 
-stream = open("configs/dream_fidelity.yaml", 'r')
+stream = open("configs/dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
 learnRate = cnfg['learnRate']  # learning rate of inverse training
