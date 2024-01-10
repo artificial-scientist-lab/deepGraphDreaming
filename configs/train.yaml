@@ -1,16 +1,16 @@
 state: '0000+1111'
 
-num_of_examples: '2.e7'
+num_of_examples: '1.e6'
 learnRate: '1.e-3'
-model_prefix: '4q_bn_last3'
+model_prefix: '4q_test'
 l2Lambda: 0.00001
 isL2Reg: False
-nnType: 10
+nnType: 4
 batch_size: 2500
-datafile: 'cont_20M.csv'
+datafile: 'cont_4q_1M.csv'
 zeroInput: False
 showFigure: True
-plotFolder: 'plots/bn_last3'
+plotFolder: 'plots/bn_test'
 epochToSaturate: 99999
 learnRateFactor: 0.95
 epochLRUpdate: 25

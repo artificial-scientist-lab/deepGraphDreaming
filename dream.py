@@ -36,7 +36,7 @@ def maxNElems(listor, N):
             
     return final_max
 
-stream = open("configs/dream.yaml", 'r')
+stream = open("configs/dream_fidelity.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
 
 learnRate = cnfg['learnRate']  # learning rate of inverse training
@@ -72,11 +72,9 @@ randinds = []
 for ii in range(num_start_graphs):
     randinds.append(random.randint(0, len(res_train_np)))
 
-# parse through slurm array
-parser = argparse.ArgumentParser()
-parser.add_argument(dest='ii')
-args = parser.parse_args()
-proc_id = int(args.ii)
+proc_id = 2
+
+# replace with slurm parser
 
 # choose start graph
 start_graph_id = proc_id % num_start_graphs

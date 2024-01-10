@@ -1,9 +1,0 @@
-state: '0000+1111'
-dim: '[2] * 4'
-num_of_examples: 2000 #if done in parallel, this is multiplied by the number of jobs
-file_name: 'con_test'
-file_type: 'csv' #choose between csv and pkl
-discretize: 'False'
-threshold: 0.50
-prop: 'concurrence'
-

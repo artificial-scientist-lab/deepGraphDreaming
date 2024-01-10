@@ -89,7 +89,7 @@ class ff_network(nn.Module):
                                 nn.Linear(49,size_of_output)
                                 )
                             
-        if (type==15): # Very long neural network, [36^26]
+        if (type==5): # Very long neural network, [36^26]
         
                         self.mynn = nn.Sequential(
                             nn.Linear(size_of_input, 36),
@@ -146,6 +146,34 @@ class ff_network(nn.Module):
                             nn.ELU(),
                             nn.Linear(36,size_of_output)
                             )
+                        
+        if(type==6): #Quadruple Neurons, now with activation functions to modify the thresholds
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,size_of_output)
+                        )
+                    
+        if(type==7): # Follow-up to 6, but with higher negative slopes on the leakyReLU
+                      self.mynn = nn.Sequential(
+                          nn.Linear(size_of_input,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,size_of_output)
+                          )
+                    
+        
 
                                     
     def forward(self, x):
@@ -465,6 +493,7 @@ def dream_model(model, desired_state, start_graph, cnfg, func):
         activation = activation.reshape(1)
         real_loss = -activation + alpha*np.sum(np.abs(edge_weights))
         loss = torch.clamp(real_loss, min=-50000, max=50000.).double()
+        
         # backpropagation step
 
         optimizer_encoder.zero_grad()

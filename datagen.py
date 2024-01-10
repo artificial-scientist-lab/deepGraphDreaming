@@ -79,7 +79,7 @@ def quickgenerate(func, numargs, isZero, prop):
     
     if(prop == 'concurrence'):
         try:
-            fidelity = 1 -  func(weights)  
+            fidelity = func(weights)  
         except ZeroDivisionError:
             fidelity = 0
             print(weights, flush=True)
@@ -123,13 +123,8 @@ def edit_graph(graph, upper_bound):
 
 if __name__ == '__main__':
 
-    # parse through slurm array
-    parser = argparse.ArgumentParser()
-    parser.add_argument(dest='ii')
-    args = parser.parse_args()
-    proc_id = int(args.ii)
 
-    stream = open(f"configs/datagen{proc_id}.yaml", 'r')
+    stream = open(f"configs/datagen.yaml", 'r')
     cnfg = yaml.load(stream, Loader=Loader)
 				
     DIM = eval(cnfg['dim'])
