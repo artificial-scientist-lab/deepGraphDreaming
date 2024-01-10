@@ -1,0 +1,23 @@
+#!/bin/bash -l
+#SBATCH --array=2
+#SBATCH --gres=gpu:1         # specify number of GPUs
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --account=def-ekarimi
+# Standard output and error:
+#SBATCH -o ./jobTrainOut/out.%j
+#SBATCH -e ./jobTrainErr/err.%j
+#SBATCH -D ./
+#SBATCH -J dgdReview
+
+#srun ./script $SLURM_ARRAY_TASK_ID 
+
+# memory
+#SBATCH --mem=64GB
+#SBATCH --time=72:00:00
+
+module load python scipy-stack
+source env/bin/activate
+
+srun python train.py --ii $SLURM_ARRAY_TASK_ID
