@@ -11,9 +11,30 @@ import csv
 import pandas as pd
 import torch
 import re
+from pytheus.lossfunctions import fidelity, make_lossString_entanglement
 
 from datagen import generatorGraphFidelity, constructGraph
-from neuralnet import prep_data, load_model, dream_model
+from neuralnet import prep_data, load_model, dream_model, neuron_selector
+
+# This function obtains the N maximum elements in a list. This is used for dreaming with the best fidelity examples
+ 
+def maxNElems(listor, N):
+    final_max = []
+    tempList = listor
+    
+    for i in range(0,N):
+        maxTemp = 0
+        maxIndex = 0
+        for j in range(len(tempList)):
+            if tempList[j] > maxTemp:
+                maxTemp = tempList[j]
+                maxIndex = j
+                
+        tempList[maxIndex] = 0
+        final_max.append(maxIndex)
+            
+            
+    return final_max
 
 stream = open("configs/dream.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
@@ -21,12 +42,9 @@ cnfg = yaml.load(stream, Loader=Loader)
 learnRate = cnfg['learnRate']  # learning rate of inverse training
 num_of_epochs = cnfg['num_of_epochs']  # for how many epochs should we run the inverse training?
 nnType = cnfg['nnType']  # the type of neural network we wish to examine
-modelname = cnfg['modelname']
+modelname = cnfg['modelname'] # The trained neural network
 num_start_graphs = cnfg['num_start_graphs'] if cnfg['start_graph'] == 'random' else 1
 
-# seed = random.randint(1000, 9999)
-# print(f'seed: {seed}')
-# cnfg['seed'] = seed
 seed = cnfg['seed']
 random.seed(seed)
 
@@ -39,27 +57,33 @@ if cnfg['datafile'].split('.')[-1] == 'pkl':
     data = data_full[:]
     res = res_full[:]
 else:
-    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";")
-    data = np.array([eval(re.sub(r"  *", ',', graph.replace('\n', '').replace('[ ', '['))) for graph in df['weights']])
+    df = pd.read_csv(cnfg['datafile'], names=['weights', 'res'], delimiter=";", nrows=cnfg['num_of_examples_fixed'])
+    try:
+        data = np.array([eval(graph) for graph in df['weights']])
+    except:
+        data = np.array(
+            [eval(re.sub(r"  *", ',', graph.replace('\n', '').replace('[ ', '['))) for graph in df['weights']])
     res = df['res'].to_numpy()
+    
 vals_train_np, vals_test_np, res_train_np, res_test_np = prep_data(data, res, 0.95)
 best_graph = np.argmax(res_train_np)  # Index pertaining to the graph with the highest fidelity in the dataset
 randinds = []
+
 for ii in range(num_start_graphs):
     randinds.append(random.randint(0, len(res_train_np)))
 
-# parse through slurm array
-parser = argparse.ArgumentParser()
-parser.add_argument(dest='ii')
-args = parser.parse_args()
-proc_id = int(args.ii)
+proc_id = 2
+
+# replace with slurm parser
 
 # choose start graph
 start_graph_id = proc_id % num_start_graphs
 if cnfg['start_graph'] == 'best':
     ind = best_graph
-else:
+elif cnfg['start_graph'] == 'random':
     ind = randinds[start_graph_id]
+else:
+    ind = start_graph_id
 
 # choose neuron from array given in config
 neuron_id = proc_id // num_start_graphs
@@ -67,6 +91,7 @@ neuron_array = eval(cnfg['neuron_array'])
 neuron_id = neuron_id % len(neuron_array)
 cnfg['layer'], cnfg['neuron'] = neuron_array[neuron_id]
 
+cnfg['dream_file'] += f"_layer{cnfg['layer']}"
 cnfg['dream_file'] += f'_{seed}'
 dreamfolder = cnfg['dream_file']
 cnfg['dream_file'] += f'/dream{start_graph_id}_{neuron_id}.csv'
@@ -89,13 +114,38 @@ print("Device:", device)
 direc = os.getcwd() + f'/models/{modelname}'
 model = load_model(direc, device, NN_INPUT, NN_OUTPUT, nnType)
 
-# We proceed to generate an initial set of edges from the dreaming process. We sample 3 graphs from our dataset
+# Here, we look over our training examples and choose the one
+# which activates the neuron the most.  
 
+startPred = np.zeros(len(vals_train_np))
+sysDict = hf.get_sysdict(cnfg['dims'])
+cnfgfid = {"heralding_out": False, "imaginary": False}
+
+if(cnfg['prop'] == 'concurrence'): # Computes the concurrence of a random graph
+    fid = make_lossString_entanglement(input_graph,sysDict)
+else: # Computes the fidelity, though this can be reconfigured for any other quantum property we wanna measure
+    fid = fidelity(input_graph,state,cnfgfid)
+
+if (cnfg['bestExamples']):
+    intermediateModel = neuron_selector(model,device, cnfg['layer'],cnfg['neuron'])
+    for ii in range(len(vals_train_np)):
+        fid, temp_graph = constructGraph(vals_train_np[ii], cnfg['dims'], fid, cnfg['prop'])
+        # Evaluate starting prediction 
+        startPred[ii] = intermediateModel(torch.tensor(temp_graph.weights, dtype=torch.float).to(device))
+
+    # If best examples is enabled, we choose the graph that triggers the maximum activation on the neuron. 
+    bestInds = maxNElems(startPred,num_start_graphs) 
+    ind = bestInds[start_graph_id]
+    print(ind)
+    print(bestInds) 
+    print(start_graph_id)
+
+# We proceed to generate an initial set of edges from the dreaming process. 
 if cnfg['start_graph'] == 'zero':
-    fid, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], state)
+    fidel, start_graph = constructGraph([0] * len(input_graph), cnfg['dims'], fid, cnfg['prop'])
 else:
-    fid, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], state)
-start_res = fid
+    fidel, start_graph = constructGraph(vals_train_np[ind], cnfg['dims'], fid, cnfg['prop'])
+start_res = fidel
 start_pred = model(torch.tensor(start_graph.weights, dtype=torch.float).to(device)).item()
 if not os.path.exists(dreamfolder):
     os.makedirs(dreamfolder)
@@ -104,6 +154,6 @@ with open(cnfg['dream_file'], 'a') as f:
     writer.writerow([start_res, start_pred, start_graph.weights])
 
 start_time = time.time()
-dream_model(model, state, start_graph, cnfg)
+dream_model(model, state, start_graph, cnfg, fid)
 
 print(f"--- done in {time.time() - start_time} seconds ---")

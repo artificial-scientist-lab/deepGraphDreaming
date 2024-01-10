@@ -19,6 +19,7 @@ import re
 from datagen import generatorGraphFidelity
 from neuralnet import prep_data, train_model
 
+
 # We compute the fidelity of the final state of each quantum graph with respect to the GHZ state.
 stream = open("configs/train.yaml", 'r')
 cnfg = yaml.load(stream, Loader=Loader)
@@ -33,9 +34,13 @@ model_prefix = cnfg['model_prefix']  # when we save the neural network as a .pt,
 l2Lambda = float(cnfg['l2Lambda'])  # Lambda parameter for L2 Regularization
 isL2Reg = float(cnfg['isL2Reg'])  # Do we want to introduce L2 Regularization in the training process?
 nnType = cnfg['nnType']  # What type of neural network do we want to train on
+isZero = cnfg['zeroInput']
+showFig = cnfg['showFigure']
+learnRateFac = cnfg['learnRateFactor']
 
 print(f"Let's a go! Number of examples: {num_of_examples}")
-print(f"Learning Rate: {learnRate}")
+print(f"Initial Learning Rate: {learnRate}")
+print(f"Learning Rate Factor: {learnRateFac}")
 
 if 'seed' in cnfg:
     seed = cnfg['seed']
@@ -69,7 +74,18 @@ else:
     print(data[0], flush=True)
     res = res[0:num_of_examples]
     print(res[0], flush=True)
-weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95)
+    
+# The testing data seems to be performing better than the training data ... it may  have something to do with the
+# manner in which the data is being prepared (the testing data may entirely comprise of graphs with discretized weights)
+# To remove this element, let's shuffle the datasets
+
+shuffleInts = np.arange(0,num_of_examples)
+np.random.shuffle(shuffleInts)
+data = data[shuffleInts]
+res = res[shuffleInts]
+np.save(f'bestShuffle_{seed}.npy',shuffleInts)
+
+weights_train, weights_test, result_train, result_test = prep_data(data, res, 0.95, zeroInput=isZero)
 NN_INPUT = len(input_edge_weights)
 NN_OUTPUT = 1
 
@@ -81,5 +97,11 @@ print(direc, flush=True)
 stream = open(f'models/config{seed}.yaml', 'w')
 yaml.dump(cnfg, stream)
 
+plotFolder = cnfg['plotFolder']
+
+# Create folder to save plots
+if not os.path.exists(plotFolder):
+        os.makedirs(plotFolder)
+
 train_model(NN_INPUT, NN_OUTPUT, weights_train, result_train, weights_test, result_test, direc, model_prefix, cnfg,
-            isL2Reg)
+            isL2Reg, save_fig=showFig)

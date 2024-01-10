@@ -1,0 +1,4 @@
+num_of_examples: 2.e7
+shuffle: 'bestShuffle_9862.npy'
+dataset: 'cont_20M'
+seed: '9862'

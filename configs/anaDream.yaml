@@ -1,0 +1,5 @@
+directory: 'dreamfiles/dream_400_layer2'
+DIM: '[2] * 4'
+isProb: True
+saveDirec: 'dreamHists/dream_400_layer2'
+neurons: '[ii for ii in range(10)]'

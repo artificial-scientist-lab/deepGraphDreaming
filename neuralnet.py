@@ -10,124 +10,175 @@ from torch import nn
 import matplotlib.pyplot as plt
 
 from datagen import constructGraph
-
+#a
 
 class ff_network(nn.Module):
     def __init__(self, size_of_input, size_of_output, type):
         super(ff_network, self).__init__()
 
-        if (type == 1):  # small neural network with 5 hidden layers and 30 neurons per layer
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, 15 * 2),
-                nn.ReLU(),
-                nn.Linear(15 * 2, size_of_output)
-            )
+        if(type==1): #Quadruple Neurons
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,400),
+                        nn.ReLU(),
+                        nn.Linear(400,400),
+                        nn.ReLU(),
+                        nn.Linear(400,400),
+                        nn.ReLU(),
+                        nn.Linear(400,400),
+                        nn.ReLU(),
+                        nn.Linear(400,size_of_output)
+                        )
+                    
+                    
+        if (type==2): # bottleneck on the last layer
+                            self.mynn = nn.Sequential(
+                                nn.Linear(size_of_input,400),
+                                nn.ReLU(),
+                                nn.Linear(400,400),
+                                nn.ReLU(), 
+                                nn.Linear(400,400),
+                                nn.ReLU(),
+                                nn.Linear(400,10),
+                                nn.ReLU(),
+                                nn.Linear(10,size_of_output),
+                                )
+                            
+                    
+        if (type==3): # This is meant to train concurrence
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input, 800),
+                        nn.ReLU(), 
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(), 
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,800),
+                        nn.ReLU(),
+                        nn.Linear(800,size_of_output)
+                        )
 
-        if (type == 2):  # This was the neural network we had been dreaming with before
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, 576 * 2),
-                nn.ReLU(),
-                nn.Linear(576 * 2, 200 * 2),
-                nn.ReLU(),
-                nn.Linear(200 * 2, 100 * 2),
-                nn.ReLU(),
-                nn.Linear(100 * 2, 50 * 2),
-                nn.ReLU(),
-                nn.Linear(50 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 30 * 2),
-                nn.ReLU(),
-                nn.Linear(30 * 2, 25 * 2),
-                nn.ReLU(),
-                nn.Linear(25 * 2, size_of_output)
-            )
+                    
+        if (type==4): # [49^10 Feedforward architecture]
+                            self.mynn = nn.Sequential(
+                                nn.Linear(size_of_input, 49),
+                                nn.ReLU(), 
+                                nn.Linear(49,49),
+                                nn.ReLU(),
+                                nn.Linear(49,49),
+                                nn.ReLU(), 
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49, 49),
+                                nn.ReLU(),
+                                nn.Linear(49,size_of_output)
+                                )
+                            
+        if (type==5): # Very long neural network, [36^26]
+        
+                        self.mynn = nn.Sequential(
+                            nn.Linear(size_of_input, 36),
+                            nn.ELU(), 
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,36),
+                            nn.ELU(),
+                            nn.Linear(36,size_of_output)
+                            )
+                        
+        if(type==6): #Quadruple Neurons, now with activation functions to modify the thresholds
+                    self.mynn = nn.Sequential(
+                        nn.Linear(size_of_input,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,400),
+                        nn.LeakyReLU(),
+                        nn.Linear(400,size_of_output)
+                        )
+                    
+        if(type==7): # Follow-up to 6, but with higher negative slopes on the leakyReLU
+                      self.mynn = nn.Sequential(
+                          nn.Linear(size_of_input,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,400),
+                          nn.LeakyReLU(negative_slope=0.05),
+                          nn.Linear(400,size_of_output)
+                          )
+                    
+        
 
-        if (type == 3):
-            constantsize = 100
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, size_of_output)
-            )
-
-        if (type == 4):
-            constantsize = 200
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, size_of_output)
-            )
-
-        if (type == 5):
-            constantsize = 200
-            self.mynn = nn.Sequential(
-                nn.Linear(size_of_input, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, constantsize),
-                nn.ReLU(),
-                nn.Linear(constantsize, 20),
-                nn.ReLU(),
-                nn.Linear(20, size_of_output)
-            )
-
+                                    
     def forward(self, x):
         res = self.mynn(x)
         return res
-
 
 def load_model(file_name, device, size_of_input, size_of_output, nnType):
     """
@@ -157,16 +208,33 @@ def load_model(file_name, device, size_of_input, size_of_output, nnType):
     return model
 
 
-def prep_data(data, res, train_test_split):
-    idx_traintest = int(len(data) * train_test_split)
-    vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
-    # input_edges_train = input_edges[0:idx_traintest]
-    res_train_np = res[0:idx_traintest]  # Output concurrence corresponding to each input graph
-
-    vals_test_np = data[idx_traintest:]
-    # input_edges_test = input_edges[idx_traintest:]
-    res_test_np = res[idx_traintest:]
-    return vals_train_np, vals_test_np, res_train_np, res_test_np
+def prep_data(data, res, train_test_split, zeroInput = False, randomNoise = False):
+    # If the dataset is really small (e.g. a single graph example), then just spit back the input-output pair
+    if(len(data)==1):
+        vals_train_np = data
+        vals_test_np = data
+        res_train_np = res
+        res_test_np = res
+        return vals_train_np, vals_test_np, res_train_np, res_test_np
+    
+    else:
+        idx_traintest = int(len(data) * train_test_split)
+        vals_train_np = data[0:idx_traintest]  # Input edges .. so these are our graphs
+        # input_edges_train = input_edges[0:idx_traintest]
+        res_train_np = res[0:idx_traintest]  # Output concurrence corresponding to each input graph
+        vals_test_np = data[idx_traintest:]
+        # input_edges_test = input_edges[idx_traintest:]
+        res_test_np = res[idx_traintest:]
+        if (zeroInput):
+            vals_train_np=np.zeros(vals_train_np.shape)
+            vals_test_np=np.zeros(vals_test_np.shape)
+        if(randomNoise): # Introduce random noise onto the weights of graphs that exhibit high fidelity
+            for ii in range(len(vals_train_np)):
+                if res_train_np[ii] > 0.5:
+                    print("High Fidelity Example found! Adding random noise to weights...")
+                    vals_train_np[ii] = vals_train_np[ii] +  np.random.uniform(-0.005,0.005,len(vals_train_np[ii]))
+    
+        return vals_train_np, vals_test_np, res_train_np, res_test_np
 
 
 def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals_test_np, res_test_np, save_direc,
@@ -192,6 +260,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     num_of_examples = int(float(config['num_of_examples']))  # Training set size
     learnRate = float(config['learnRate'])  # Learning rate
     l2Lambda = float(config['l2Lambda'])  # Lambda parameter for L2 Regularization
+    epochToSaturate = float(config['epochToSaturate'])
     nnType = config['nnType']  # What type of neural network do we want to train on
 
     batch_size = min(len(vals_train_np), config['batch_size'])
@@ -221,6 +290,13 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
     test_loss_evolution = []
 
     start_time = time.time()
+    
+    
+    # Let's set up an adaptive learnimg rate 
+    
+    lmbda = lambda epoch: config['learnRateFactor']
+    scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer_predictor, lr_lambda=lmbda,verbose=True)
+    lrUpdate = config['epochLRUpdate']
 
     print('Everything prepared, lets train')
 
@@ -273,17 +349,23 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
                     writer.writerow(
                         [train_loss, test_loss])
 
-            if len(test_loss_evolution) - np.argmin(test_loss_evolution) > 50:
+            if len(test_loss_evolution) - np.argmin(test_loss_evolution) > epochToSaturate: # This was set to 50 in the original code
                 print('    Early stopping kicked in: test loss', np.argmin(test_loss_evolution),
                       len(test_loss_evolution))
                 break
 
-            if (time.time() - start_time) > 24 * 60 * 60:
+            if (time.time() - start_time) > 72 * 60 * 60:
                 print('    Early stopping kicked in: too much time has elasped')
                 break
-    if save_fig:
-        plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-                  vals_train_np)
+            
+            if epoch % lrUpdate == 0 and len(test_loss_evolution) - np.argmin(test_loss_evolution) > lrUpdate:
+                print("The test loss doesn't seem to be changing much, so let's change the learn rate")
+                scheduler.step()
+                
+
+        if save_fig and epoch % 50 == 0:
+            plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
+                  vals_train_np,epoch, config['plotFolder'])
 
     print('Best test MSE: ', min(test_loss_evolution))
     print("...DONE")
@@ -293,7 +375,7 @@ def train_model(NN_INPUT_SIZE, NN_OUTPUT_SIZE, vals_train_np, res_train_np, vals
 
 
 def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution, vals_test_np,
-              vals_train_np):
+              vals_train_np,epoch, plotFolder):
     plt.plot(train_loss_evolution, label='train')
     plt.clf()
     plt.plot(train_loss_evolution, label='train')
@@ -305,8 +387,9 @@ def plot_loss(num_of_examples, suffix, test_loss_evolution, train_loss_evolution
     plt.ylabel('loss')
     plt.xlabel('episode')
     plt.legend(loc="lower left")
+    print(plotFolder)
+    plt.savefig(plotFolder+'/nn_train_results_' + str(num_of_examples) + '_' + suffix + '_'+str(epoch)+'.png')
     plt.show()
-    plt.savefig('nn_train_results_' + str(num_of_examples) + suffix + '_.png')
 
 
 def neuron_selector(model, device, layer, neuron):
@@ -332,10 +415,10 @@ def neuron_selector(model, device, layer, neuron):
         new_output_layer.bias[0] = old_output_layer.bias[neuron]
 
     if (layer == 0):
-        print("gobble gobble")
+        print(f"Inverse training on input layer and neuron {neuron}")
         new_model = new_output_layer.to(device)
     else:
-        print(f"gobble gobble {layer}")
+        print(f"Inverse training on layer {layer}, neuron {neuron}")
         middle_model = total_model[:layer - 1]
         new_model = nn.Sequential(*middle_model, nn.ReLU(), new_output_layer).to(device)
 
@@ -344,7 +427,7 @@ def neuron_selector(model, device, layer, neuron):
     return new_model
 
 
-def dream_model(model, desired_state, start_graph, cnfg):
+def dream_model(model, desired_state, start_graph, cnfg, func):
     """
     Inverse trains the model by freezing the weights and biases and optimizing instead for the input.
     In particular, we want to find the input that maximizes our output from whatever neuron we are interested in looking over
@@ -368,7 +451,9 @@ def dream_model(model, desired_state, start_graph, cnfg):
     num_epochs = cnfg['num_of_epochs']
     layer_index = cnfg['layer']
     neuron_index = cnfg['neuron']
-
+    alpha = cnfg['L1Alpha'] # positive real coefficent for L1 Regularization
+     
+    print(f"alpha: {alpha}")
     loss_prediction = []
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     prop = 1
@@ -390,19 +475,25 @@ def dream_model(model, desired_state, start_graph, cnfg):
     # initialize an instance of the model
     optimizer_encoder = torch.optim.Adam([data_train_var], lr=lr)
     interm_model = neuron_selector(model, device, layer_index, neuron_index)
+    # Let's set up an adaptive learnimg rate 
+    lmbda = lambda epoch: cnfg['learnRateFactor']
+    scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer_encoder, lr_lambda=lmbda,verbose=True)
+    lrUpdate = cnfg['epochLRUpdate']
 
     for epoch in range(num_epochs):
 
         # feedforward step
         activation = interm_model(data_train_var)
         activation_evolution.append(activation.cpu().detach().numpy())
-
+        
+        # Towards computing L1 Regularization, we extract information about the absolute value of the weights
+        edge_weights = data_train_var.cpu().detach().numpy()
+        
         # mean squared error between target and calculated property
         activation = activation.reshape(1)
-        # criterion = nn.MSELoss()
-        # real_loss=criterion(activation, data_train_prop) # So we calculate the mean squared error between the predicted fidelity and the target one
-        real_loss = -activation
+        real_loss = -activation + alpha*np.sum(np.abs(edge_weights))
         loss = torch.clamp(real_loss, min=-50000, max=50000.).double()
+        
         # backpropagation step
 
         optimizer_encoder.zero_grad()
@@ -419,14 +510,27 @@ def dream_model(model, desired_state, start_graph, cnfg):
         if epoch % 100 == 0:
             # We update our graph now with potentially new weight values and recompute the fidelity
             modified_edge_weights = data_train_var.cpu().detach().numpy()
-            fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, desired_state)
+            print(modified_edge_weights)
+            try:
+                fidelity = func(modified_edge_weights)  
+                print(fidelity)
+            except ZeroDivisionError:
+                fidelity = 0
+                print(modified_edge_weights, flush=True)
+            #fidelity, dream_graph = constructGraph(modified_edge_weights, dimensions, func, cnfg['prop'])
+            weights = [float(item) for item in modified_edge_weights]
             activation = interm_model(data_train_var).item()
-            #print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
+            print(f'epoch: {epoch} gradient: {input_grad_norm} fidelity {fidelity} activation {activation}', flush=True)
             with open(cnfg['dream_file'], 'a') as f:
                 writer = csv.writer(f, delimiter=";")
-                writer.writerow([fidelity, activation, dream_graph.weights])
+                writer.writerow([fidelity, activation, weights])
+                 
+        if epoch % lrUpdate == 0:
+            if len(activation_evolution) - np.argmax(activation_evolution) > lrUpdate:
+                print('Our predictions arent changing much, so let us adjust the learn rate')
+                scheduler.step()
 
-        if len(gradDec) > 1000:
+        if cnfg['useGrad'] == True and len(gradDec) > 1000:
             if gradDec[-1] < 1e-7 and 0.99 * gradDec[-100] <= gradDec[-1]:
                 print('The gradient is very near zero at this point, stop dreaming at epoch ', epoch)
                 break
@@ -436,5 +540,7 @@ def dream_model(model, desired_state, start_graph, cnfg):
                         'Our predictions arent changing much, maybe our gradient is going back and forth? Stop dreaming at epoch ',
                         epoch)
                     break
-
+    
+    print("Dreaming finished!")
     return 0
+

@@ -1,13 +1,22 @@
-state: '000000+111111'
-num_of_examples: 10000000
-learnRate: '1.e-4'
-num_of_examples_fixed:
-num_of_epochs: 30000
-nnType: 5
-modelname: '6partGHZ_seed111.pt'
-start_graph: 'zero'
-neuron_array: '[[12,i] for i in range(20)]'
-num_start_graphs: 1
-dream_file: 'dreamfiles/dream6q20nzero'
-datafile: 'data_train.pkl'
+state: '0000+1111'
+num_of_examples: 1.e6
+learnRate: '1.e-3'
+num_of_examples_fixed: 1000
+num_of_epochs: 100000
+nnType: 1
+modelname: 'GHZFidelity_400.pt'
+start_graph: 'random'
+neuron_array: '[[8,0]]'   
+num_start_graphs: 10
+dream_file: 'dreamfiles/test'
+datafile: 'cont_4q_1M.csv'
+bestExamples: False
 seed: 888
+useGrad: True
+learnRateFactor: 1.0
+epochLRUpdate: 99999
+L1Alpha: 0.000
+prop: 'fidelity'
+
+
+
